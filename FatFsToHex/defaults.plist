@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>volumeName</key>
+	<string>NO NAME</string>
+	<key>checkForNonPrintChars</key>
+	<integer>1</integer>
+	<key>binaryIO</key>
+	<integer>0</integer>
+	<key>checkUTF8</key>
+	<integer>1</integer>
+	<key>portName</key>
+	<string></string>
+	<key>blockSize</key>
+	<integer>512</integer>
+	<key>pageSize</key>
+	<integer>4096</integer>
+	<key>volumeSize</key>
+	<integer>8</integer>
+	<key>baudRate</key>
+	<integer>250000</integer>
+	<key>appendLineEnding</key>
+	<integer>1</integer>
+</dict>
+</plist>

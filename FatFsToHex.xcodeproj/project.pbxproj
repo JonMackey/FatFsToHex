@@ -1,0 +1,448 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		DA1A238D2002C60B00E11924 /* SerialPortIOSession.m in Sources */ = {isa = PBXBuildFile; fileRef = DA1A238C2002C60B00E11924 /* SerialPortIOSession.m */; };
+		DA1A23902002CD5B00E11924 /* SendHexIOSession.m in Sources */ = {isa = PBXBuildFile; fileRef = DA1A238F2002CD5B00E11924 /* SendHexIOSession.m */; };
+		DA2D41F920C8927C0089BFA7 /* Tabs.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA2D41F720C8927B0089BFA7 /* Tabs.mm */; };
+		DA65BCF42000191D00485FBF /* ffunicode.c in Sources */ = {isa = PBXBuildFile; fileRef = DA65BCF32000191D00485FBF /* ffunicode.c */; };
+		DA73EBF91FFA79A400CF1812 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DA73EBF81FFA79A400CF1812 /* AppDelegate.m */; };
+		DA73EBFB1FFA79A400CF1812 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA73EBFA1FFA79A400CF1812 /* Assets.xcassets */; };
+		DA73EBFE1FFA79A400CF1812 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DA73EBFC1FFA79A400CF1812 /* MainMenu.xib */; };
+		DA73EC011FFA79A400CF1812 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DA73EC001FFA79A400CF1812 /* main.m */; };
+		DA73EC0B1FFA7BDC00CF1812 /* FatFsToHexWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA73EC091FFA7BDC00CF1812 /* FatFsToHexWindowController.mm */; };
+		DA73EC0C1FFA7BDC00CF1812 /* FatFsToHexWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DA73EC0A1FFA7BDC00CF1812 /* FatFsToHexWindowController.xib */; };
+		DA73EC0F1FFAC98D00CF1812 /* StorageAccess.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA73EC0D1FFAC98D00CF1812 /* StorageAccess.mm */; };
+		DA73EC171FFACBCB00CF1812 /* ff.c in Sources */ = {isa = PBXBuildFile; fileRef = DA73EC111FFACBCB00CF1812 /* ff.c */; };
+		DA86AEB71FFBE05700D4D645 /* SerialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA86AEB51FFBE05700D4D645 /* SerialViewController.m */; };
+		DA86AEB81FFBE05700D4D645 /* FatFsSerialViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DA86AEB61FFBE05700D4D645 /* FatFsSerialViewController.xib */; };
+		DA86AEBB1FFBED5A00D4D645 /* ORSSerial.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA86AEBA1FFBED5A00D4D645 /* ORSSerial.framework */; };
+		DA86AEBD1FFC13F400D4D645 /* defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = DA86AEBC1FFC13F400D4D645 /* defaults.plist */; };
+		DA86AEBF1FFC253100D4D645 /* ORSSerial.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DA86AEBA1FFBED5A00D4D645 /* ORSSerial.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DA9DCCBB1FFEC22E00F040DB /* VolumeNameFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DCCBA1FFEC22E00F040DB /* VolumeNameFormatter.m */; };
+		DABBA2651FFD273100D65809 /* LogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DABBA2641FFD273100D65809 /* LogViewController.m */; };
+		DABBA2681FFD306100D65809 /* FatFsSerialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DABBA2671FFD306100D65809 /* FatFsSerialViewController.m */; };
+		DABBA26C1FFD6DF400D65809 /* FatFsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DABBA26A1FFD6DF400D65809 /* FatFsTableViewController.m */; };
+		DABBA26D1FFD6DF400D65809 /* FatFsTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DABBA26B1FFD6DF400D65809 /* FatFsTableViewController.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DA86AEBE1FFC251400D4D645 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				DA86AEBF1FFC253100D4D645 /* ORSSerial.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		DA1A238B2002C60B00E11924 /* SerialPortIOSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SerialPortIOSession.h; sourceTree = "<group>"; };
+		DA1A238C2002C60B00E11924 /* SerialPortIOSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SerialPortIOSession.m; sourceTree = "<group>"; };
+		DA1A238E2002CD5B00E11924 /* SendHexIOSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SendHexIOSession.h; sourceTree = "<group>"; };
+		DA1A238F2002CD5B00E11924 /* SendHexIOSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SendHexIOSession.m; sourceTree = "<group>"; };
+		DA2D41F720C8927B0089BFA7 /* Tabs.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Tabs.mm; sourceTree = "<group>"; };
+		DA2D41F820C8927C0089BFA7 /* Tabs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tabs.h; sourceTree = "<group>"; };
+		DA65BCF32000191D00485FBF /* ffunicode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ffunicode.c; sourceTree = "<group>"; };
+		DA73EBF41FFA79A400CF1812 /* FatFsToHex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FatFsToHex.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA73EBF71FFA79A400CF1812 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		DA73EBF81FFA79A400CF1812 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		DA73EBFA1FFA79A400CF1812 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DA73EBFD1FFA79A400CF1812 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		DA73EBFF1FFA79A400CF1812 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DA73EC001FFA79A400CF1812 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		DA73EC021FFA79A400CF1812 /* FatFsToHex.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FatFsToHex.entitlements; sourceTree = "<group>"; };
+		DA73EC081FFA7BDC00CF1812 /* FatFsToHexWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FatFsToHexWindowController.h; sourceTree = "<group>"; };
+		DA73EC091FFA7BDC00CF1812 /* FatFsToHexWindowController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FatFsToHexWindowController.mm; sourceTree = "<group>"; };
+		DA73EC0A1FFA7BDC00CF1812 /* FatFsToHexWindowController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FatFsToHexWindowController.xib; sourceTree = "<group>"; };
+		DA73EC0D1FFAC98D00CF1812 /* StorageAccess.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = StorageAccess.mm; sourceTree = "<group>"; };
+		DA73EC0E1FFAC98D00CF1812 /* StorageAccess.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StorageAccess.h; sourceTree = "<group>"; };
+		DA73EC111FFACBCB00CF1812 /* ff.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ff.c; sourceTree = "<group>"; };
+		DA73EC121FFACBCB00CF1812 /* integer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = integer.h; sourceTree = "<group>"; };
+		DA73EC131FFACBCB00CF1812 /* diskio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = diskio.h; sourceTree = "<group>"; };
+		DA73EC151FFACBCB00CF1812 /* ffconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ffconf.h; sourceTree = "<group>"; };
+		DA73EC161FFACBCB00CF1812 /* ff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ff.h; sourceTree = "<group>"; };
+		DA86AEB41FFBE05700D4D645 /* SerialViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SerialViewController.h; sourceTree = "<group>"; };
+		DA86AEB51FFBE05700D4D645 /* SerialViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SerialViewController.m; sourceTree = "<group>"; };
+		DA86AEB61FFBE05700D4D645 /* FatFsSerialViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FatFsSerialViewController.xib; sourceTree = "<group>"; };
+		DA86AEBA1FFBED5A00D4D645 /* ORSSerial.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ORSSerial.framework; sourceTree = "<group>"; };
+		DA86AEBC1FFC13F400D4D645 /* defaults.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = defaults.plist; sourceTree = "<group>"; };
+		DA9DCCB91FFEC22E00F040DB /* VolumeNameFormatter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VolumeNameFormatter.h; sourceTree = "<group>"; };
+		DA9DCCBA1FFEC22E00F040DB /* VolumeNameFormatter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VolumeNameFormatter.m; sourceTree = "<group>"; };
+		DABBA2631FFD273100D65809 /* LogViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LogViewController.h; sourceTree = "<group>"; };
+		DABBA2641FFD273100D65809 /* LogViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LogViewController.m; sourceTree = "<group>"; };
+		DABBA2661FFD306100D65809 /* FatFsSerialViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FatFsSerialViewController.h; sourceTree = "<group>"; };
+		DABBA2671FFD306100D65809 /* FatFsSerialViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FatFsSerialViewController.m; sourceTree = "<group>"; };
+		DABBA2691FFD6DF400D65809 /* FatFsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FatFsTableViewController.h; sourceTree = "<group>"; };
+		DABBA26A1FFD6DF400D65809 /* FatFsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FatFsTableViewController.m; sourceTree = "<group>"; };
+		DABBA26B1FFD6DF400D65809 /* FatFsTableViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FatFsTableViewController.xib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DA73EBF11FFA79A400CF1812 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA86AEBB1FFBED5A00D4D645 /* ORSSerial.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DA73EBEB1FFA79A400CF1812 = {
+			isa = PBXGroup;
+			children = (
+				DA73EBF61FFA79A400CF1812 /* FatFsToHex */,
+				DA73EBF51FFA79A400CF1812 /* Products */,
+				DA86AEB91FFBED3200D4D645 /* Frameworks and Libraries */,
+			);
+			sourceTree = "<group>";
+		};
+		DA73EBF51FFA79A400CF1812 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DA73EBF41FFA79A400CF1812 /* FatFsToHex.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DA73EBF61FFA79A400CF1812 /* FatFsToHex */ = {
+			isa = PBXGroup;
+			children = (
+				DA73EBF71FFA79A400CF1812 /* AppDelegate.h */,
+				DA73EBF81FFA79A400CF1812 /* AppDelegate.m */,
+				DA1A238E2002CD5B00E11924 /* SendHexIOSession.h */,
+				DA1A238F2002CD5B00E11924 /* SendHexIOSession.m */,
+				DA73EBFA1FFA79A400CF1812 /* Assets.xcassets */,
+				DA73EBFC1FFA79A400CF1812 /* MainMenu.xib */,
+				DA73EBFF1FFA79A400CF1812 /* Info.plist */,
+				DA73EC001FFA79A400CF1812 /* main.m */,
+				DA73EC021FFA79A400CF1812 /* FatFsToHex.entitlements */,
+				DA73EC081FFA7BDC00CF1812 /* FatFsToHexWindowController.h */,
+				DA73EC091FFA7BDC00CF1812 /* FatFsToHexWindowController.mm */,
+				DA73EC0A1FFA7BDC00CF1812 /* FatFsToHexWindowController.xib */,
+				DA9DCCB91FFEC22E00F040DB /* VolumeNameFormatter.h */,
+				DA9DCCBA1FFEC22E00F040DB /* VolumeNameFormatter.m */,
+				DABBA2691FFD6DF400D65809 /* FatFsTableViewController.h */,
+				DABBA26A1FFD6DF400D65809 /* FatFsTableViewController.m */,
+				DABBA26B1FFD6DF400D65809 /* FatFsTableViewController.xib */,
+				DABBA2661FFD306100D65809 /* FatFsSerialViewController.h */,
+				DABBA2671FFD306100D65809 /* FatFsSerialViewController.m */,
+				DA86AEB41FFBE05700D4D645 /* SerialViewController.h */,
+				DA86AEB51FFBE05700D4D645 /* SerialViewController.m */,
+				DA86AEB61FFBE05700D4D645 /* FatFsSerialViewController.xib */,
+				DA1A238B2002C60B00E11924 /* SerialPortIOSession.h */,
+				DA1A238C2002C60B00E11924 /* SerialPortIOSession.m */,
+				DABBA2631FFD273100D65809 /* LogViewController.h */,
+				DABBA2641FFD273100D65809 /* LogViewController.m */,
+				DA73EC0D1FFAC98D00CF1812 /* StorageAccess.mm */,
+				DA73EC0E1FFAC98D00CF1812 /* StorageAccess.h */,
+				DA2D41F820C8927C0089BFA7 /* Tabs.h */,
+				DA2D41F720C8927B0089BFA7 /* Tabs.mm */,
+				DA86AEBC1FFC13F400D4D645 /* defaults.plist */,
+				DA73EC101FFACB4F00CF1812 /* FatFs */,
+			);
+			path = FatFsToHex;
+			sourceTree = "<group>";
+		};
+		DA73EC101FFACB4F00CF1812 /* FatFs */ = {
+			isa = PBXGroup;
+			children = (
+				DA73EC131FFACBCB00CF1812 /* diskio.h */,
+				DA73EC111FFACBCB00CF1812 /* ff.c */,
+				DA73EC161FFACBCB00CF1812 /* ff.h */,
+				DA73EC151FFACBCB00CF1812 /* ffconf.h */,
+				DA73EC121FFACBCB00CF1812 /* integer.h */,
+				DA65BCF32000191D00485FBF /* ffunicode.c */,
+			);
+			path = FatFs;
+			sourceTree = "<group>";
+		};
+		DA86AEB91FFBED3200D4D645 /* Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				DA86AEBA1FFBED5A00D4D645 /* ORSSerial.framework */,
+			);
+			name = "Frameworks and Libraries";
+			path = FatFsToHex;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DA73EBF31FFA79A400CF1812 /* FatFsToHex */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA73EC051FFA79A400CF1812 /* Build configuration list for PBXNativeTarget "FatFsToHex" */;
+			buildPhases = (
+				DA73EBF01FFA79A400CF1812 /* Sources */,
+				DA73EBF11FFA79A400CF1812 /* Frameworks */,
+				DA73EBF21FFA79A400CF1812 /* Resources */,
+				DA86AEBE1FFC251400D4D645 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FatFsToHex;
+			productName = FatFsToHex;
+			productReference = DA73EBF41FFA79A400CF1812 /* FatFsToHex.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DA73EBEC1FFA79A400CF1812 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0920;
+				ORGANIZATIONNAME = Jon;
+				TargetAttributes = {
+					DA73EBF31FFA79A400CF1812 = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = DA73EBEF1FFA79A400CF1812 /* Build configuration list for PBXProject "FatFsToHex" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = DA73EBEB1FFA79A400CF1812;
+			productRefGroup = DA73EBF51FFA79A400CF1812 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DA73EBF31FFA79A400CF1812 /* FatFsToHex */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DA73EBF21FFA79A400CF1812 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DABBA26D1FFD6DF400D65809 /* FatFsTableViewController.xib in Resources */,
+				DA86AEB81FFBE05700D4D645 /* FatFsSerialViewController.xib in Resources */,
+				DA73EBFB1FFA79A400CF1812 /* Assets.xcassets in Resources */,
+				DA86AEBD1FFC13F400D4D645 /* defaults.plist in Resources */,
+				DA73EBFE1FFA79A400CF1812 /* MainMenu.xib in Resources */,
+				DA73EC0C1FFA7BDC00CF1812 /* FatFsToHexWindowController.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DA73EBF01FFA79A400CF1812 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA65BCF42000191D00485FBF /* ffunicode.c in Sources */,
+				DABBA2681FFD306100D65809 /* FatFsSerialViewController.m in Sources */,
+				DA73EC171FFACBCB00CF1812 /* ff.c in Sources */,
+				DA86AEB71FFBE05700D4D645 /* SerialViewController.m in Sources */,
+				DA73EC011FFA79A400CF1812 /* main.m in Sources */,
+				DA1A23902002CD5B00E11924 /* SendHexIOSession.m in Sources */,
+				DA1A238D2002C60B00E11924 /* SerialPortIOSession.m in Sources */,
+				DABBA26C1FFD6DF400D65809 /* FatFsTableViewController.m in Sources */,
+				DA73EC0F1FFAC98D00CF1812 /* StorageAccess.mm in Sources */,
+				DA73EBF91FFA79A400CF1812 /* AppDelegate.m in Sources */,
+				DA9DCCBB1FFEC22E00F040DB /* VolumeNameFormatter.m in Sources */,
+				DA2D41F920C8927C0089BFA7 /* Tabs.mm in Sources */,
+				DA73EC0B1FFA7BDC00CF1812 /* FatFsToHexWindowController.mm in Sources */,
+				DABBA2651FFD273100D65809 /* LogViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		DA73EBFC1FFA79A400CF1812 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DA73EBFD1FFA79A400CF1812 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		DA73EC031FFA79A400CF1812 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		DA73EC041FFA79A400CF1812 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		DA73EC061FFA79A400CF1812 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = FatFsToHex/FatFsToHex.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/FatFsToHex",
+				);
+				INFOPLIST_FILE = FatFsToHex/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mackey.FatFsToHex;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		DA73EC071FFA79A400CF1812 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = FatFsToHex/FatFsToHex.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/FatFsToHex",
+				);
+				INFOPLIST_FILE = FatFsToHex/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mackey.FatFsToHex;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		DA73EBEF1FFA79A400CF1812 /* Build configuration list for PBXProject "FatFsToHex" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA73EC031FFA79A400CF1812 /* Debug */,
+				DA73EC041FFA79A400CF1812 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DA73EC051FFA79A400CF1812 /* Build configuration list for PBXNativeTarget "FatFsToHex" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA73EC061FFA79A400CF1812 /* Debug */,
+				DA73EC071FFA79A400CF1812 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DA73EBEC1FFA79A400CF1812 /* Project object */;
+}
