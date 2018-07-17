@@ -23,7 +23,7 @@ FatFsToHex was written to get a FAT file system image onto a NOR Flash chip for 
    
 Launch FatFsToHex.  The initial panel shown is for dropping files and folders to be loaded into the FAT root folder.  The order they appear in the list is the physical order in the file system.  Once in the list you can drag the files to change the order.  Files are removed by selecting a row and pressing the delete key.
 
-There is no GUI past the root.  You can drag folders, and these folders will be iterated and files with them and any sub folders will be added in the order they are returned by the OS's enumerator.  Unlike the root, there is no way to set the physical order these files will appear in the file system.
+There is no GUI past the root.  You can drag folders, and these folders will be iterated and files within them and any sub folders will be added in the order they are returned by the OS's enumerator.  Unlike the root, there is no way to set the physical order these files will appear in the file system.
 
 ![Image](RootPanel.png)
 
