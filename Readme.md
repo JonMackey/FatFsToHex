@@ -39,3 +39,4 @@ Load the HexLoader sketch onto any Atmel ATmega328p.  Hookup the device to the 3
 
 For the H and E commands the HexLoader will respond with an asterisk.  During the hex load session you'll see several asterisks, one for each hex line processed.  If all lines are processed without error "Success!" will appear to mark the end of the session.  The session will also end if an error occurs with the associated error message displayed.
 
+HexLoader wiring for NOR Flash: Wired as "Arduino as ISP", with the ICSP reset line serving as chip select.  For the NOR Flash you'll need a 3v3 ISP or a level shifter to 3v3.
