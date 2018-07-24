@@ -19,8 +19,10 @@
 	<key>volumeSize</key>
 	<integer>8</integer>
 	<key>baudRate</key>
-	<integer>250000</integer>
+	<integer>9600</integer>
 	<key>appendLineEnding</key>
+	<integer>1</integer>
+	<key>eraseBeforeWrite</key>
 	<integer>1</integer>
 </dict>
 </plist>

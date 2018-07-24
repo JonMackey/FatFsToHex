@@ -45,53 +45,72 @@
 /********************************** begin *************************************/
 - (void)begin
 {
-	uint8_t command = 'H';
+	[super begin];
+	uint8_t command = self.eraseBeforeWrite ? 'H':'h';
 	[self.serialPort sendData:[NSData dataWithBytes:&command length:1]];
 }
 
 /***************************** didReceiveData *********************************/
 - (NSData*)didReceiveData:(NSData *)inData
 {
-	if (inData.length >= 1 &&
-		*(const uint8_t*)inData.bytes == '*')
+	if (!self.done)
 	{
-		// Find the end of the current line.
-		const uint8_t* bytesStart = (const uint8_t*)self.data.bytes + _offset;
-		const uint8_t* bytes = bytesStart;
-		const uint8_t* bytesEnd =  (const uint8_t*)self.data.bytes + self.data.length;
-		if (bytes < bytesEnd)
+		//fprintf(stderr, "%.*s\n", (int)inData.length, inData.bytes);
+		int	status = 0;
+		if (inData.length >= 1)
 		{
-			for (; bytes < bytesEnd; bytes++)
+			const uint8_t*	recievedData = inData.bytes;
+			NSUInteger	length = inData.length;
+			
+			for (NSUInteger i = 0; i < length && status >= 0; i++)
 			{
-				if (*bytes != '\n')
+				switch (recievedData[i])
 				{
-					continue;
+					case '*':	// Process next line request
+						status = 1;
+						continue;
+					case '=':	// Ignore erase block successful char
+					case '+':	// Ignore debug char
+					case '-':	// Ignore debug char
+						continue;
+					default:	// Some error occured or garbage char returned
+						status = -1;
+						self.done = YES;
+						break;
 				}
-				break;
 			}
-			NSRange	lineRange = NSMakeRange(_offset, (bytes - bytesStart) +1);
-			NSData*	lineData = [self.data subdataWithRange:lineRange];
-			//fprintf(stderr, "Sent %d bytes at offset %d\n%.*s\n", (int)lineData.length, (int)_offset, (int)lineData.length, lineData.bytes);
-			_offset += lineRange.length;
-			[self.serialPort sendData:lineData];
-		} else
-		{
-			//fprintf(stderr, "done - bytes >= bytesEnd\n");
-			_done = YES;
 		}
-	} else
-	{
-		// Some error occured
-		//fprintf(stderr, "done - Some error occured\n");
-		_done = YES;
+		if (status == 1)
+		{
+			// Find the end of the current line.
+			const uint8_t* bytesStart = (const uint8_t*)self.data.bytes + _offset;
+			const uint8_t* bytes = bytesStart;
+			const uint8_t* bytesEnd =  (const uint8_t*)self.data.bytes + self.data.length;
+			if (bytes < bytesEnd)
+			{
+				for (; bytes < bytesEnd; bytes++)
+				{
+					if (*bytes != '\n')
+					{
+						continue;
+					}
+					break;
+				}
+				NSRange	lineRange = NSMakeRange(_offset, (bytes - bytesStart) +1);
+				NSData*	lineData = [self.data subdataWithRange:lineRange];
+				//fprintf(stderr, "Sent %d bytes at offset %d\n%.*s\n", (int)lineData.length, (int)_offset, (int)lineData.length, lineData.bytes);
+				_offset += lineRange.length;
+				//fprintf(stderr, "lineRange.length = %d\n", (int)lineRange.length);
+				[self.serialPort sendData:lineData];
+			} else
+			{
+				//fprintf(stderr, "done - bytes >= bytesEnd\n");
+				self.done = YES;
+			}
+		}
 	}
 	return(inData);
 }
 
-/********************************* isDone *************************************/
-- (BOOL)isDone
-{
-	return(_done);
-}
 
 @end

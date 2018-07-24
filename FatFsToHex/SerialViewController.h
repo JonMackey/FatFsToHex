@@ -36,6 +36,8 @@
 - (IBAction)openOrClosePort:(id)sender;
 
 - (BOOL)portIsOpen:(BOOL)inReportIfNoConnection;
+- (void)stop;
+-(BOOL)sessionIsDone;
 
 @property (unsafe_unretained) IBOutlet NSTextField *sendTextField;
 @property (unsafe_unretained) IBOutlet NSButton *openCloseButton;

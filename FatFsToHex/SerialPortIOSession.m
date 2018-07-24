@@ -46,18 +46,36 @@
     fprintf(stderr, "dealloc SerialPortIOSession\n");
 }
 
+/********************************** begin *************************************/
 - (void)begin
 {
+	_done = NO;
+	_stopped = NO;
 }
 
+/********************************** begin *************************************/
 - (NSData*)didReceiveData:(NSData *)inData
 {
 	return(inData);
 }
 
+/********************************* isDone *************************************/
 - (BOOL)isDone
 {
-	return(YES);
+	return(_done);
+}
+
+/********************************** stop **************************************/
+- (void)stop
+{
+	_done = YES;
+	_stopped = YES;
+}
+
+/******************************* wasStopped ***********************************/
+- (BOOL)wasStopped
+{
+	return(_stopped);
 }
 
 @end

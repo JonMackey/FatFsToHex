@@ -32,6 +32,8 @@
 
 @interface SerialPortIOSession : NSObject
 
+@property (nonatomic) BOOL done;
+@property (nonatomic) BOOL stopped;
 @property (nonatomic, strong) ORSSerialPort* serialPort;
 @property (nonatomic, strong) NSData* data;
 
@@ -39,5 +41,6 @@
 - (void)begin;
 - (NSData*)didReceiveData:(NSData *)inData;
 - (BOOL)isDone;
-
+- (BOOL)wasStopped;
+- (void)stop;
 @end

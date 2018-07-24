@@ -256,14 +256,24 @@
 	[self postInfoString: [NSString stringWithFormat:@"%@ closed", [self.serialPort name]]];
 }
 
+-(BOOL)sessionIsDone
+{
+	BOOL isDone = [self.serialPortSession isDone];
+	if (isDone)
+	{
+		self.serialPortSession = NULL;
+	}
+	return(isDone);
+}
+
 - (void)serialPort:(ORSSerialPort *)serialPort didReceiveData:(NSData *)data
 {
 	if (self.serialPortSession)
 	{
-		data = [self.serialPortSession didReceiveData:data];
-		if ([self.serialPortSession isDone])
+		if (![self sessionIsDone])
 		{
-			self.serialPortSession = NULL;
+			data = [self.serialPortSession didReceiveData:data];
+			[self sessionIsDone];	// Check to see if the session is done.
 		}
 	}
 	if (data.length)
@@ -355,6 +365,15 @@
 {
 	//NSLog(@"Serial port %@ encountered an error: %@", serialPort, error);
 	[self postErrorString: [NSString stringWithFormat:@"Serial port %@ encountered an error: %@", serialPort, error]];
+}
+
+/********************************** stop **************************************/
+- (void)stop
+{
+	if (self.serialPortSession)
+	{
+		[self.serialPortSession stop];
+	}
 }
 
 #pragma mark - NSUserNotificationCenterDelegate

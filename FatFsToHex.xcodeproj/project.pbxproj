@@ -120,8 +120,6 @@
 			children = (
 				DA73EBF71FFA79A400CF1812 /* AppDelegate.h */,
 				DA73EBF81FFA79A400CF1812 /* AppDelegate.m */,
-				DA1A238E2002CD5B00E11924 /* SendHexIOSession.h */,
-				DA1A238F2002CD5B00E11924 /* SendHexIOSession.m */,
 				DA73EBFA1FFA79A400CF1812 /* Assets.xcassets */,
 				DA73EBFC1FFA79A400CF1812 /* MainMenu.xib */,
 				DA73EBFF1FFA79A400CF1812 /* Info.plist */,
@@ -142,6 +140,8 @@
 				DA86AEB61FFBE05700D4D645 /* FatFsSerialViewController.xib */,
 				DA1A238B2002C60B00E11924 /* SerialPortIOSession.h */,
 				DA1A238C2002C60B00E11924 /* SerialPortIOSession.m */,
+				DA1A238E2002CD5B00E11924 /* SendHexIOSession.h */,
+				DA1A238F2002CD5B00E11924 /* SendHexIOSession.m */,
 				DABBA2631FFD273100D65809 /* LogViewController.h */,
 				DABBA2641FFD273100D65809 /* LogViewController.m */,
 				DA73EC0D1FFAC98D00CF1812 /* StorageAccess.mm */,

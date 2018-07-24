@@ -1,3 +1,24 @@
+/*******************************************************************************
+	License
+	****************************************************************************
+	This program is free software; you can redistribute it
+	and/or modify it under the terms of the GNU General
+	Public License as published by the Free Software
+	Foundation; either version 3 of the License, or
+	(at your option) any later version.
+ 
+	This program is distributed in the hope that it will
+	be useful, but WITHOUT ANY WARRANTY; without even the
+	implied warranty of MERCHANTABILITY or FITNESS FOR A
+	PARTICULAR PURPOSE. See the GNU General Public
+	License for more details.
+ 
+	Licence can be viewed at
+	http://www.gnu.org/licenses/gpl-3.0.txt
+//
+	Please maintain this license information along with authorship
+	and copyright notices in any redistribution of this code
+*******************************************************************************/
 /*
 *	HexLoader.ino
 *	Copyright (c) 2018 Jonathan Mackey
@@ -38,11 +59,8 @@ SdVolume vol;
 #else
 #include "SPIMem.h"
 SPIMem flash(SdChipSelect);
-#define BAUD_RATE	9600	// At F_CPU == 8MHz you get Serial buffer overruns
-							// at speeds > 9600 (and even when you don't there
-							// is no great speed improvement.)
+#define BAUD_RATE	19200
 #endif
-
 
 enum EIntelHexLineState
 {
@@ -75,8 +93,14 @@ enum EIntelHexStatus
 const uint32_t	kBlockSize = 512;
 #ifndef USE_SD
 static uint8_t	sBuffer[kBlockSize];
+static bool		sVerifyAfterWrite = true;
+static bool		sEraseBeforeWrite;
+static uint32_t	sCurrent64KBlk;
 #endif
-static bool		sVerifyAfterWrite = false;
+#define MAX_HEX_LINE_LEN	45
+static uint8_t	sLineBuffer[MAX_HEX_LINE_LEN];
+static uint8_t*	sLineBufferPtr;
+static uint8_t*	sEndOfLineBufferPtr;
 
 #ifndef USE_SD
 void DumpJDECInfo(void)
@@ -135,10 +159,27 @@ void loop()
 	while (!Serial.available());
 	switch (Serial.read())
 	{
-		case 'H':
+	#ifdef USE_SD
+		case 'h':
+		case 'H':	// Erase before write (default)
 			HexDownload();
 			break;
-	#ifndef USE_SD
+	#else
+		case 'H':	// Erase before write
+			sEraseBeforeWrite = true;
+			sCurrent64KBlk = 0xF0000000;
+			HexDownload();
+			break;
+		/*
+		*	For a new or erased chip there is no need to erase before write.
+		*	For all other NOR Flash chips you must erase before write because
+		*	writing only clears bits, it doesn't set them.  Erasing sets all
+		*	bits to 1.
+		*/
+		case 'h':	// Don't erase before write
+			sEraseBeforeWrite = false;
+			HexDownload();
+			break;
 		case 'E':
 			FullErase();
 			break;
@@ -197,55 +238,79 @@ bool WriteBlock(
 		success = card.writeBlock(inBlockIndex, inData);
 	#else
 		uint32_t	address = inBlockIndex*kBlockSize;
-		success = flash.WritePage(address, inData) &&
-					flash.WritePage(address+256, &inData[256]);
-		if (sVerifyAfterWrite)
+		/*
+		*	If erase before write is enabled AND
+		*	the address just stepped over a 64KB block boundary THEN
+		*	Erase the block. (this assumes all addresses are increasing)
+		*/
+		//Serial.write('+');
+		if (sEraseBeforeWrite &&
+			(address/0x10000) != sCurrent64KBlk)
 		{
-			uint8_t	verifyBuff[256];
-			#if 1
-			success = flash.Read(address, 256, verifyBuff) &&
-				memcmp(inData, verifyBuff, 256) == 0 &&
-				flash.Read(address+256, 256, verifyBuff) &&
-				memcmp(&inData[256], verifyBuff, 256) == 0;
-			#else
-			success = flash.Read(address, 256, verifyBuff);
+			sCurrent64KBlk = address/0x10000;
+			success = flash.Erase64KBlock(address);
 			if (success)
 			{
-				success = memcmp(inData, verifyBuff, 256) == 0;
+				Serial.write('=');
+			}
+		}
+		//Serial.write('-');
+		if (success)
+		{
+			success = flash.WritePage(address, inData) &&
+						flash.WritePage(address+256, &inData[256]);
+			if (sVerifyAfterWrite)
+			{
+				uint8_t	verifyBuff[256];
+				#if 0
+				success = flash.Read(address, 256, verifyBuff) &&
+					memcmp(inData, verifyBuff, 256) == 0 &&
+					flash.Read(address+256, 256, verifyBuff) &&
+					memcmp(&inData[256], verifyBuff, 256) == 0;
+				#else
+				success = flash.Read(address, 256, verifyBuff);
 				if (success)
 				{
-					success = flash.Read(address+256, 256, verifyBuff);
+					success = memcmp(inData, verifyBuff, 256) == 0;
 					if (success)
 					{
-						success = memcmp(&inData[256], verifyBuff, 256) == 0;
-						if (!success)
+						success = flash.Read(address+256, 256, verifyBuff);
+						if (success)
 						{
-							Serial.print("?Failed compare data[256]\n");
-							/*Serial.write((const char*)verifyBuff, 256);
-							Serial.print("\n\n");
-							Serial.write((const char*)&inData[256], 256);
-							Serial.print("\n\n");*/
+							success = memcmp(&inData[256], verifyBuff, 256) == 0;
+							if (!success)
+							{
+								Serial.print("?Failed compare data[256]\n");
+								/*Serial.write((const char*)verifyBuff, 256);
+								Serial.print("\n\n");
+								Serial.write((const char*)&inData[256], 256);
+								Serial.print("\n\n");*/
+							}
+						} else
+						{
+							Serial.print("?Failed reading data[256]\n");
 						}
 					} else
 					{
-						Serial.print("?Failed reading data[256]\n");
+						Serial.print("?Failed compare data[0]\n");
+						/*Serial.write((const char*)verifyBuff, 256);
+						Serial.print("\n\n");
+						Serial.write((const char*)inData, 256);
+						Serial.print("\n\n");*/
 					}
 				} else
 				{
-					Serial.print("?Failed compare data[0]\n");
-					/*Serial.write((const char*)verifyBuff, 256);
-					Serial.print("\n\n");
-					Serial.write((const char*)inData, 256);
-					Serial.print("\n\n");*/
+					Serial.print("?Failed reading data[0]\n");
 				}
-			} else
-			{
-				Serial.print("?Failed reading data[0]\n");
+				#endif
 			}
-			#endif
-		}
+		} else
+		{
+			Serial.print("?Block erase failed\n");
+		}		
 	#endif
 	}
+
 	return(success);
 }
 
@@ -260,8 +325,61 @@ uint8_t	HexAsciiToBin(
 /********************************* GetChar ************************************/
 uint8_t GetChar(void)
 {
-	while (!Serial.available());
+	uint32_t	timeout = millis() + 1000;
+	while (!Serial.available())
+	{
+		if (millis() < timeout)continue;
+		return('T');
+	}
 	return(Serial.read());
+}
+
+/**************************** GetNexHextLineChar ******************************/
+uint8_t GetNexHextLineChar(void)
+{
+	uint8_t	thisChar = sEndOfLineBufferPtr > sLineBufferPtr ? *(sLineBufferPtr++) : 'O';
+	return(thisChar);
+}
+
+/******************************* LoadHexLine **********************************/
+bool LoadHexLine(void)
+{
+	uint8_t	thisChar = GetChar();
+	uint8_t*	bufferPtr = sLineBuffer;
+	uint8_t*	endBufferPtr = &sLineBuffer[MAX_HEX_LINE_LEN];
+	sLineBufferPtr = sLineBuffer;
+	while (thisChar != ':')
+	{
+		switch (thisChar)
+		{
+			case '\n':
+			case '\r':
+			case ' ':
+			case '\t':
+				thisChar = GetChar();
+			continue;
+		}
+		sLineBuffer[0] = thisChar;
+		sEndOfLineBufferPtr = &sLineBuffer[1];
+		return(false);	// Start code not found
+	}
+	
+	do
+	{
+		*(bufferPtr++) = thisChar;
+		thisChar = GetChar();
+		if (thisChar != '\n')
+		{
+			if (thisChar != 'T')
+			{
+				continue;
+			}
+			sLineBuffer[0] = 'T';
+		}
+		break;
+	} while(bufferPtr < endBufferPtr);
+	sEndOfLineBufferPtr = bufferPtr;
+	return(thisChar == '\n');
 }
 
 /******************************* HexDownload **********************************/
@@ -285,25 +403,33 @@ void HexDownload(void)
 	Serial.write('*');	// Tell the host the mode change was successful
 	while(status == eProcessing)
 	{
-		thisChar = GetChar();
+		LoadHexLine();
+		thisChar = GetNexHextLineChar();
 		if (thisChar != ':')
 		{
+			/*
+			*	If this isn't the character 'S' for stop THEN
+			*	report the invalid character.
+			*/
 			switch (thisChar)
 			{
-				case '\n':
-				case '\r':
-				case ' ':
-				case '\t':
-				continue;
+				case 'S':
+					Serial.print("?Stopped by user\n");
+					break;
+				case 'T':
+					Serial.print("?Rx Timeout\n");
+					break;
+				default:
+					Serial.print("?No Start Code\n");
+					break;
 			}
-			Serial.print("?Invalid Character\n");
 			status = eError;
 			break;
 		} else
 		{
 			while(status == eProcessing)
 			{
-				thisChar = GetChar();
+				thisChar = GetNexHextLineChar();
 				hiLow++;	// nibble toggle
 				/*
 				*	If this is the high nibble THEN

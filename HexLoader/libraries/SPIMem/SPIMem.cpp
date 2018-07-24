@@ -1,3 +1,24 @@
+/*******************************************************************************
+	License
+	****************************************************************************
+	This program is free software; you can redistribute it
+	and/or modify it under the terms of the GNU General
+	Public License as published by the Free Software
+	Foundation; either version 3 of the License, or
+	(at your option) any later version.
+ 
+	This program is distributed in the hope that it will
+	be useful, but WITHOUT ANY WARRANTY; without even the
+	implied warranty of MERCHANTABILITY or FITNESS FOR A
+	PARTICULAR PURPOSE. See the GNU General Public
+	License for more details.
+ 
+	Licence can be viewed at
+	http://www.gnu.org/licenses/gpl-3.0.txt
+//
+	Please maintain this license information along with authorship
+	and copyright notices in any redistribution of this code
+*******************************************************************************/
 /*
 *	SPIMem.cpp
 *	Copyright (c) 2018 Jonathan Mackey
@@ -8,7 +29,7 @@
 #include <SPI.h>
 #include "SPIMem.h"
 
-#ifdef F_CPU
+#ifdef F_CPU dfd
 	#if F_CPU >= 16000000L
 		#define SPI_CLOCK_DIV SPI_CLOCK_DIV4
 	#else // 8 MHz
@@ -25,7 +46,10 @@ enum
 	eWriteDisableCmd,
 	eReadStat1Cmd,
 	eWriteEnableCmd,
+	eEraseSectorCmd	= 0x20,
+	eErase32KBlkCmd	= 0x52,
 	eChipEraseCmd	= 0x60,
+	eErase64KBlkCmd	= 0xD8,
 	eReadJEDECIDCmd	= 0x9F,
 	
 	eChipBusyBit	=	1,
@@ -180,6 +204,63 @@ void SPIMem::WriteDisable(void)
 {
 	SendCmd(eWriteDisableCmd);
 	Unselect();
+}
+
+/********************************* EraseSector ********************************/
+bool SPIMem::EraseSector(
+	uint32_t	inAddr)
+{
+
+	bool success = WaitTillReady() && WriteEnable();
+	if (success)
+	{
+		SendCmd(eEraseSectorCmd);
+		SPI.transfer(inAddr >> 16);
+		SPI.transfer(inAddr >>  8);
+		SPI.transfer(inAddr);
+		Unselect();
+		success = WaitTillReady(1000);	// Max time to erase a sector is 400ms
+		WriteDisable();
+	}
+	return success;
+}
+
+/******************************** Erase32KBlock ********************************/
+bool SPIMem::Erase32KBlock(
+	uint32_t	inAddr)
+{
+
+	bool success = WaitTillReady() && WriteEnable();
+	if (success)
+	{
+		SendCmd(eErase32KBlkCmd);
+		SPI.transfer(inAddr >> 16);
+		SPI.transfer(inAddr >>  8);
+		SPI.transfer(inAddr);
+		Unselect();
+		success = WaitTillReady(2000);	// Max time to erase a 32K block is 1.6s
+		WriteDisable();
+	}
+	return success;
+}
+
+/******************************* Erase64KBlock ********************************/
+bool SPIMem::Erase64KBlock(
+	uint32_t	inAddr)
+{
+
+	bool success = WaitTillReady() && WriteEnable();
+	if (success)
+	{
+		SendCmd(eErase64KBlkCmd);
+		SPI.transfer(inAddr >> 16);
+		SPI.transfer(inAddr >>  8);
+		SPI.transfer(inAddr);
+		Unselect();
+		success = WaitTillReady(2500);	// Max time to erase a 64K block is 2s
+		WriteDisable();
+	}
+	return success;
 }
 
 /********************************* ChipErase **********************************/

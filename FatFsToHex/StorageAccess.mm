@@ -31,6 +31,11 @@
 
 StorageAccess*	StorageAccess::sInstance = NULL;
 const size_t StorageAccess::kBufferSize = 4096;
+// HEX_LINE_DATA_LEN was hard coded as 32.  32 results in a 76 byte hex line
+// length that has the potential of overwriting the 64 byte Arduino serial
+// ring buffer.  This is probably why the Arduino ISP uses 16 data bytes which
+// results in a 44 byte hex line.
+#define HEX_LINE_DATA_LEN	16
 
 /***************************** StorageAccess **********************************/
 StorageAccess::StorageAccess(void)
@@ -333,9 +338,9 @@ bool StorageAccess::SaveToHexFile(
 				lastUpperAddress = upperAddress;
 			}
 			entireBlockIsNull = true;
-			for (uint32_t offset = 0; offset < mBlockSize; offset += 32)
+			for (uint32_t offset = 0; offset < mBlockSize; offset += HEX_LINE_DATA_LEN)
 			{
-				if (!LineIsEmpty(&dataPtr[offset], 32))
+				if (!LineIsEmpty(&dataPtr[offset], HEX_LINE_DATA_LEN))
 				{
 					entireBlockIsNull = false;
 					if (needsAddressRecord)
@@ -344,7 +349,7 @@ bool StorageAccess::SaveToHexFile(
 						needsAddressRecord = false;
 						fwrite(hexLine, 1, lineLength, file);
 					}
-					lineLength = ToIntelHexLine(&dataPtr[offset], 32, baseAddress + offset, 0, hexLine);
+					lineLength = ToIntelHexLine(&dataPtr[offset], HEX_LINE_DATA_LEN, baseAddress + offset, 0, hexLine);
 					fwrite(hexLine, 1, lineLength, file);
 				}
 			}

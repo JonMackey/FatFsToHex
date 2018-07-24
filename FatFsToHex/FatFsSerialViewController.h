@@ -33,4 +33,6 @@
 @interface FatFsSerialViewController : SerialViewController
 - (void)sendHexFile:(NSURL*)inURL;
 
+@property (nonatomic) BOOL eraseBeforeWrite;
+
 @end

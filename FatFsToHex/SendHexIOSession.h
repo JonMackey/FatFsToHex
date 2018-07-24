@@ -31,8 +31,8 @@
 
 @interface SendHexIOSession : SerialPortIOSession
 
-@property (nonatomic) BOOL done;
 @property (nonatomic) NSUInteger offset;
+@property (nonatomic) BOOL eraseBeforeWrite;
 
 - (instancetype)initWithData:(NSData *)inData port:(ORSSerialPort *)inPort;
 - (void)begin;

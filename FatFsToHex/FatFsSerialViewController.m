@@ -36,6 +36,19 @@
 
 @implementation FatFsSerialViewController
 
+/********************************* dealloc ************************************/
+- (void)dealloc
+{
+	[self unbind:@"eraseBeforeWrite"];
+}
+
+/****************************** viewDidLoad ***********************************/
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+
+	[self bind:@"eraseBeforeWrite" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:@"eraseBeforeWrite" options:NULL];
+}
 
 /******************************* sendHexFile **********************************/
 - (void)sendHexFile:(NSURL*)inDocURL
@@ -45,7 +58,28 @@
 		NSError* error;
 		NSData *dataToSend = [NSData dataWithContentsOfURL:inDocURL options:0 error:&error];
 		self.serialPortSession = [[SendHexIOSession alloc] initWithData:dataToSend port:self.serialPort];
+		((SendHexIOSession*)self.serialPortSession).eraseBeforeWrite = self.eraseBeforeWrite;
 		[self.serialPortSession begin];
 	}
 }
+
+/****************************** sessionIsDone *********************************/
+-(BOOL)sessionIsDone
+{
+	BOOL wasStopped = [self.serialPortSession wasStopped];
+	BOOL isDone = [super sessionIsDone];
+	if (isDone && wasStopped)
+	{
+		[self appendNewLine];
+		[self postWarningString:@"Send FatFs session stopped by user"];
+		/*
+		*	Tell the HexLoader to stop, assuming it's not hung.
+		*/
+		uint8_t	stopChar = 'S';
+		NSData*	stopData = [NSData dataWithBytes:&stopChar length:1];
+		[self.serialPort sendData:stopData];
+	}
+	return(isDone);
+}
+
 @end

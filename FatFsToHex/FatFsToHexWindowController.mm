@@ -328,6 +328,12 @@
 	}
 }
 
+/******************************* stopFatFsSend ********************************/
+- (IBAction)stopFatFsSend:(id)sender
+{
+	[self.fatFsSerialViewController stop];
+}
+
 /******************************* exportHexFile ********************************/
 - (BOOL)exportHexFile:(NSURL*)inDocURL
 {
