@@ -33,6 +33,7 @@
 
 @property (nonatomic) NSUInteger offset;
 @property (nonatomic) BOOL eraseBeforeWrite;
+@property (nonatomic) uint32_t currentAddress;
 
 - (instancetype)initWithData:(NSData *)inData port:(ORSSerialPort *)inPort;
 - (void)begin;

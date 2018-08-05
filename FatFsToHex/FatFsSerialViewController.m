@@ -46,8 +46,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
 	[self bind:@"eraseBeforeWrite" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:@"eraseBeforeWrite" options:NULL];
+	self.progressMax = 1;
+	self.progressTextTemplate = @"%d of %d"; //[NSString stringWithString:self.progressText];
+	self.progressText = @""; // [NSString string];
 }
 
 /******************************* sendHexFile **********************************/
@@ -63,9 +65,34 @@
 	}
 }
 
+/******************************* fatFsCreated *********************************/
+- (void)fatFsCreated:(uint32_t)inBlockSize blockCount:(uint32_t)inBlockCount
+{
+	self.progressText = [NSString stringWithFormat:self.progressTextTemplate, 0, inBlockCount];
+	self.blockSize = inBlockSize;	// For progress text
+	self.blockCount = inBlockCount;	// For progress text
+	self.blocksSent = 0;
+	self.progressMax = inBlockCount * inBlockSize;
+	self.progressValue = 0;
+}
+
+/****************************** updateProgress ********************************/
+-(void)updateProgress
+{
+	// blocksSent is nth block, 1 to N, with 0 meaning nothing sent
+	uint32_t	blocksSent = (((SendHexIOSession*)self.serialPortSession).currentAddress / self.blockSize) +1;
+	if (blocksSent != self.blocksSent)
+	{
+		self.blocksSent = blocksSent;
+		self.progressText = [NSString stringWithFormat:self.progressTextTemplate, blocksSent, self.blockCount];
+	}
+	self.progressValue = ((SendHexIOSession*)self.serialPortSession).currentAddress;
+}
+
 /****************************** sessionIsDone *********************************/
 -(BOOL)sessionIsDone
 {
+	[self updateProgress];
 	BOOL wasStopped = [self.serialPortSession wasStopped];
 	BOOL isDone = [super sessionIsDone];
 	if (isDone && wasStopped)

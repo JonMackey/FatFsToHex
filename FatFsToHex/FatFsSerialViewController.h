@@ -31,7 +31,17 @@
 #import "SerialViewController.h"
 
 @interface FatFsSerialViewController : SerialViewController
+@property (nonatomic, strong) NSString* progressTextTemplate;
+@property (nonatomic, strong) NSString* progressText;
+@property (nonatomic) double progressMax;
+@property (nonatomic) double progressValue;
+@property (nonatomic) uint32_t blockCount;
+@property (nonatomic) uint32_t blockSize;
+@property (nonatomic) uint32_t blocksSent;
+
+
 - (void)sendHexFile:(NSURL*)inURL;
+- (void)fatFsCreated:(uint32_t)inBlockSize blockCount:(uint32_t)inBlockCount;
 
 @property (nonatomic) BOOL eraseBeforeWrite;
 

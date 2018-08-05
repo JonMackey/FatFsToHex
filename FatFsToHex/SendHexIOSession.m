@@ -46,6 +46,7 @@
 - (void)begin
 {
 	[super begin];
+	self.currentAddress = 0;
 	uint8_t command = self.eraseBeforeWrite ? 'H':'h';
 	[self.serialPort sendData:[NSData dataWithBytes:&command length:1]];
 }
@@ -82,6 +83,10 @@
 		}
 		if (status == 1)
 		{
+			if (inData.length == 1)
+			{
+				inData = [NSData data];	// Don't need to see the '*'
+			}
 			// Find the end of the current line.
 			const uint8_t* bytesStart = (const uint8_t*)self.data.bytes + _offset;
 			const uint8_t* bytes = bytesStart;
@@ -101,6 +106,7 @@
 				//fprintf(stderr, "Sent %d bytes at offset %d\n%.*s\n", (int)lineData.length, (int)_offset, (int)lineData.length, lineData.bytes);
 				_offset += lineRange.length;
 				//fprintf(stderr, "lineRange.length = %d\n", (int)lineRange.length);
+				[self processHexLine:lineData];
 				[self.serialPort sendData:lineData];
 			} else
 			{
@@ -112,5 +118,153 @@
 	return(inData);
 }
 
+/***************************** processHexLine *********************************/
+/*
+*	Used to update a progress bar by extracting the current address of the line
+*	being sent.
+*/
+- (void)processHexLine:(NSData *)inLineData
+{
+	enum EIntelHexRecordType
+	{
+		eRecordTypeData,		// 0
+		eRecordTypeEOF,			// 1
+		eRecordTypeExSegAddr,	// 2
+		eRecordTypeStSegAddr,	// 3
+		eRecordTypeExLinAddr,	// 4
+		eRecordTypeStLinAddr	// 5
+	};
+	enum EIntelHexStatus
+	{
+		eProcessing,
+		eDone,
+		eError
+	};
+	enum EIntelHexLineState
+	{
+		// Start code   Byte count   Address H/L   Record type   Data   Checksum
+		eGetByteCount,
+		eGetAddressH,
+		eGetAddressL,
+		eGetRecordType,
+		eGetData,
+		eGetChecksum
+	};
+
+	const uint8_t* bytePtr = (const uint8_t*)inLineData.bytes;
+	const uint8_t* bytesEnd =  (const uint8_t*)inLineData.bytes + inLineData.length;
+	uint8_t	    thisChar;
+	uint8_t		thisByte = 0;
+	uint8_t		state = 0;
+	uint8_t		status = eProcessing;
+	uint32_t	byteCount = 0;
+	uint32_t	addressOffset = 0;
+	uint32_t	baseAddress = self.currentAddress & 0xFFFF0000;
+	uint8_t		recordType = eRecordTypeData;
+	uint8_t		checksum = 0;
+	uint8_t		hiLow = 1;
+	uint32_t	dataIndex = 0;
+	
+	if (bytePtr < bytesEnd)
+	{
+		thisChar = *(bytePtr++);
+		if (thisChar != ':')
+		{
+			status = eError;
+		} else
+		{
+			while(status == eProcessing &&
+					bytePtr < bytesEnd)
+			{
+				thisChar = *(bytePtr++);
+				hiLow++;	// nibble toggle
+				/*
+				*	If this is the high nibble THEN
+				*	process the complete byte
+				*/
+				if (hiLow & 1)
+				{
+					thisByte = (thisByte << 4) + (thisChar <= '9' ? (thisChar - '0') : (thisChar - ('A' - 10)));
+					checksum += thisByte;
+					switch (state)
+					{
+						case eGetByteCount:
+						{
+							byteCount = thisByte;
+							addressOffset = 0;
+							state++;
+							continue;
+						}
+						case eGetAddressH:
+						case eGetAddressL:
+							addressOffset = (addressOffset << 8) + thisByte;
+							state++;
+							continue;
+						case eGetRecordType:
+							recordType = thisByte;
+							state++;
+							dataIndex = 0;
+							if (recordType == eRecordTypeData)
+							{
+								continue;
+							} else if (recordType == eRecordTypeExLinAddr)
+							{
+								addressOffset = 0;	// The data contains the address
+								if (byteCount != 2)
+								{
+									// byteCount for RecordTypeExLinAddr not 2
+									status = eError;
+								}
+							} else if (recordType == eRecordTypeEOF)
+							{
+								state++;	// Skip eGetData
+							} else
+							{
+								// Unsupported type
+								status = eError;
+							}
+							continue;
+						case eGetData:
+							if (recordType == eRecordTypeExLinAddr)
+							{
+								addressOffset = (addressOffset << 8) + thisByte;
+							}
+							dataIndex++;
+							if (dataIndex < byteCount)
+							{
+								continue;
+							}
+							state++;
+							continue;
+						case eGetChecksum:
+							if (checksum == 0)
+							{
+								state = 0;
+								if (recordType == eRecordTypeExLinAddr)
+								{
+									baseAddress = addressOffset << 16;
+								}
+								status = eDone;
+								break;
+							}
+							// Checksum error
+							status = eError;
+							break;
+					}
+					break;
+				} else
+				{
+					thisByte = thisChar <= '9' ? (thisChar - '0') : (thisChar - ('A' - 10));
+				}
+			}
+		}
+	}
+	if (status == eDone &&
+		recordType != eRecordTypeEOF)
+	{
+		//fprintf(stderr, "0x%X 0x%X\n", baseAddress, addressOffset);
+		self.currentAddress = baseAddress + addressOffset;
+	}
+}
 
 @end

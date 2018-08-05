@@ -192,11 +192,19 @@ NSString *const kRowPasteboardType = @"kRowPasteboardType";
 /******************************* acceptDrop ***********************************/
 - (BOOL)tableView:(NSTableView *)tableView acceptDrop:(id<NSDraggingInfo>)sender row:(NSInteger)row dropOperation:(NSTableViewDropOperation)dropOperation
 {
-	BOOL success = NO;
+	__block BOOL success = NO;
     NSPasteboard *pasteboard = [sender draggingPasteboard];
 	if ( [[pasteboard types] containsObject:NSPasteboardTypeFileURL] )
 	{
-		success = [self insertFile:[NSURL URLFromPasteboard:pasteboard] atIndex:row];
+		NSArray*	urls = [pasteboard readObjectsForClasses:@[[NSURL class]] options:nil];
+	//	fprintf (stderr, "count = %ld\n", urls.count);
+
+		[urls enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:
+			^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop)
+			{
+				success |= [self insertFile:obj atIndex:row];
+			}];
+		//success = [self insertFile:[NSURL URLFromPasteboard:pasteboard] atIndex:row];
 	} else if ([[pasteboard types] containsObject:kRowPasteboardType])
 	{
 		NSData* data = [pasteboard dataForType:kRowPasteboardType];

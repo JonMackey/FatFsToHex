@@ -208,6 +208,16 @@
 				}
 			}];
 	}
+	
+	if (success)
+	{
+		// Update the serial progress bar even though it's not known how the
+		// created FS will be used.  By doing this the serial progress bar text
+		// will be updated to show the number of blocks in the current FS.
+		[self.fatFsSerialViewController fatFsCreated:StorageAccess::GetInstance()->GetBlockSize() blockCount:StorageAccess::GetInstance()->GetHighestBlockIndex() +1];
+	}
+	
+	//fprintf(stderr, "Highest block used = 0x%X of 0x%X\n", StorageAccess::GetInstance()->GetHighestBlockIndex(), StorageAccess::GetInstance()->GetMaxBlockIndex());
 	return(success);
 }
 

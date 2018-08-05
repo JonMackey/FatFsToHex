@@ -64,6 +64,15 @@ public:
 	uint8_t*				GetBlock(
 								uint32_t				inBlockIndex,
 								bool					inCreateIfUndefined = false);
+	uint32_t				GetHighestBlockIndex(void) const;
+	uint32_t				GetMaxBlockIndex(void) const
+								{return(mVolumeSize/mBlockSize);}
+	uint32_t				GetBlockSize(void) const
+								{return(mBlockSize);}
+	uint32_t				GetPageSize(void) const
+								{return(mPageSize);}
+	uint32_t				GetVolumeSize(void) const
+								{return(mVolumeSize);}
 	bool					SaveToHexFile(
 								const char*				inPath);
 	bool					Format(void);

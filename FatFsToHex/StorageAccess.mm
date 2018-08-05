@@ -37,6 +37,16 @@ const size_t StorageAccess::kBufferSize = 4096;
 // results in a 44 byte hex line.
 #define HEX_LINE_DATA_LEN	16
 
+enum EIntelHexRecordType
+{
+	eRecordTypeData,		// 0
+	eRecordTypeEOF,			// 1
+	eRecordTypeExSegAddr,	// 2
+	eRecordTypeStSegAddr,	// 3
+	eRecordTypeExLinAddr,	// 4
+	eRecordTypeStLinAddr	// 5
+};
+
 /***************************** StorageAccess **********************************/
 StorageAccess::StorageAccess(void)
 	: mBlockSize(0), mBuffer(NULL)
@@ -249,7 +259,7 @@ size_t ToIntelHexLine(
 
 	inLineBuffer[0] = ':';
 	char* nextHexBytePtr = Int8ToHexStr(inDataLen, &inLineBuffer[1]);
-	if (inRecordType != 4)
+	if (inRecordType != eRecordTypeExLinAddr)
 	{
 		thisByte = inAddress >> 8;
 		nextHexBytePtr = Int8ToHexStr(thisByte, nextHexBytePtr);
@@ -270,8 +280,8 @@ size_t ToIntelHexLine(
 	{
 		nextHexBytePtr = Int8ToHexStr(0, nextHexBytePtr);
 		nextHexBytePtr = Int8ToHexStr(0, nextHexBytePtr);
-		nextHexBytePtr = Int8ToHexStr(4, nextHexBytePtr);
-		checksum += 4;
+		nextHexBytePtr = Int8ToHexStr(eRecordTypeExLinAddr, nextHexBytePtr);
+		checksum += eRecordTypeExLinAddr;
 		thisByte = inAddress >> 8;
 		nextHexBytePtr = Int8ToHexStr(thisByte, nextHexBytePtr);
 		checksum += thisByte;
@@ -301,6 +311,17 @@ bool LineIsEmpty(
 	return(true);
 }
 
+/*************************** GetHighestBlockIndex *****************************/
+/*
+*	Used to determine how much space has been used in the FS.
+*/
+uint32_t StorageAccess::GetHighestBlockIndex(void) const
+{
+	BlockMap::const_reverse_iterator	itr = mBlockMap.rbegin();
+	BlockMap::const_reverse_iterator	itrEnd = mBlockMap.rend();
+	return(itr != itrEnd ? itr->first : 0);
+}
+
 /****************************** SaveToHexFile *********************************/
 bool StorageAccess::SaveToHexFile(
 	const char*	inPath)
@@ -317,7 +338,6 @@ bool StorageAccess::SaveToHexFile(
 		uint32_t	upperAddress = 0;
 		uint32_t	lastUpperAddress = 0;
 		uint8_t*	dataPtr;
-		bool		needsAddressRecord = false;
 		bool		entireBlockIsNull;
 		size_t		lineLength;
 		
@@ -334,8 +354,9 @@ bool StorageAccess::SaveToHexFile(
 			upperAddress = address / 0x10000;
 			if (upperAddress != lastUpperAddress)
 			{
-				needsAddressRecord = true;
 				lastUpperAddress = upperAddress;
+				lineLength = ToIntelHexLine(NULL, 2, upperAddress, eRecordTypeExLinAddr, hexLine);
+				fwrite(hexLine, 1, lineLength, file);
 			}
 			entireBlockIsNull = true;
 			for (uint32_t offset = 0; offset < mBlockSize; offset += HEX_LINE_DATA_LEN)
@@ -343,13 +364,7 @@ bool StorageAccess::SaveToHexFile(
 				if (!LineIsEmpty(&dataPtr[offset], HEX_LINE_DATA_LEN))
 				{
 					entireBlockIsNull = false;
-					if (needsAddressRecord)
-					{
-						lineLength = ToIntelHexLine(NULL, 2, upperAddress, 4, hexLine);
-						needsAddressRecord = false;
-						fwrite(hexLine, 1, lineLength, file);
-					}
-					lineLength = ToIntelHexLine(&dataPtr[offset], HEX_LINE_DATA_LEN, baseAddress + offset, 0, hexLine);
+					lineLength = ToIntelHexLine(&dataPtr[offset], HEX_LINE_DATA_LEN, baseAddress + offset, eRecordTypeData, hexLine);
 					fwrite(hexLine, 1, lineLength, file);
 				}
 			}
@@ -361,11 +376,11 @@ bool StorageAccess::SaveToHexFile(
 			if (entireBlockIsNull)
 			{
 				//fprintf(stderr, "entireBlockIsNull = %X\n", address);
-				lineLength = ToIntelHexLine(dataPtr, 1, baseAddress, 0, hexLine);
+				lineLength = ToIntelHexLine(dataPtr, 1, baseAddress, eRecordTypeData, hexLine);
 				fwrite(hexLine, 1, lineLength, file);
 			}
 		}
-		lineLength = ToIntelHexLine(dataPtr, 0, 0, 1, hexLine);
+		lineLength = ToIntelHexLine(dataPtr, 0, 0, eRecordTypeEOF, hexLine);
 		fwrite(hexLine, 1, lineLength, file);
 		fclose(file);
 		success = true;
