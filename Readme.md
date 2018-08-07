@@ -40,3 +40,6 @@ Load the HexLoader sketch onto any Atmel ATmega328p.  Hookup the device to the 3
 For the H and E commands the HexLoader will respond with an asterisk.  During the hex load session you'll see several asterisks, one for each hex line processed.  If Erase Before Write is selected, you'll see and equal sign char for each 64K block that's erased.  If all lines are processed without error "Success!" will appear to mark the end of the session.  The session will also end if an error occurs with the associated error message displayed.
 
 HexLoader wiring for NOR Flash: Wired as "Arduino as ISP", with the ICSP reset line serving as chip select.  For the NOR Flash you'll need a 3v3 ISP or a level shifter to 3v3.
+
+If you're copying anything more than a 100Kb, the HexLoader will take quite a while to copy.  I wrote a HexCopier sketch that copies hex encoded data from an SD card to the NOR Flash much faster.  The SD card must contain the file "FLASH.HEX" in the root folder.  The wiring is similar to the HexLoader with the addition of a chip select line for the SD card.  HexCopier requires the SPIMem lib used by HexLoader and the SdFat library by William Greiman.  To create the FLASH.HEX file use the export feature of FatFsToHex.
+
