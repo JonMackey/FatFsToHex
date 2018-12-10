@@ -29,7 +29,7 @@
 #include <SPI.h>
 #include "SPIMem.h"
 
-#ifdef F_CPU dfd
+#ifdef F_CPU
 	#if F_CPU >= 16000000L
 		#define SPI_CLOCK_DIV SPI_CLOCK_DIV4
 	#else // 8 MHz
@@ -275,7 +275,7 @@ bool SPIMem::ChipErase(void)
 		//	Chip Erase Time 08 = 6 seconds
 		//	Chip Erase Time 32 = 15 seconds
 		//	Chip Erase Time 64 = 100 seconds
-		success = WaitTillReady(150 * 1000);	// Max time to erase a 8MB chip (W25Q64)
+		success = WaitTillReady(150 * 1000UL);	// Max time to erase a 8MB chip (W25Q64)
 		WriteDisable();
 	}
 	return success;

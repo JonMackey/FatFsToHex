@@ -30,8 +30,9 @@
 *	- wait for serial
 *	- wait for SD card
 *	- receive 'C' to start copy of SD file flash.hex to NOR Flash chip
-*	- returns "flash.hex, commencing copy to NOR Flash"
-*	- process the hex file
+*	- returns "Hex file opened, size = 6912192"
+*			  "Copy starting..."
+*	- process the hex file. one '=' sent for each 64K cleared
 *	- returns "Success!" when done otherwise an error message is sent.
 *
 *	Line processing:
@@ -43,15 +44,20 @@
 */
 #include <SPI.h>
 
+#ifdef __AVR_ATmega644P__
+const uint8_t SdChipSelect = 3;
+#else
+// ATmega328p or pb
 const uint8_t SdChipSelect = 9;
-const uint8_t NORFlashChipSelect = 10;
+#endif
+const uint8_t NORFlashChipSelect = SS;
 
 #include <SdFat.h>
 #include "SPIMem.h"
 
 Sd2Card card;
 SdVolume vol;
-SPIMem flash(NORFlashChipSelect);
+SPIMem norFlash(NORFlashChipSelect);
 #define BAUD_RATE	19200
 
 enum EIntelHexLineState
@@ -87,37 +93,45 @@ static uint8_t	sBuffer[kBlockSize];
 static bool		sVerifyAfterWrite = true;
 static bool		sEraseBeforeWrite;
 static uint32_t	sCurrent64KBlk;
+#ifdef __AVR_ATmega644P__
+const uint32_t	kHexFileBufferSize = 512;
+#else
+const uint32_t	kHexFileBufferSize = 128;
+#endif
+static uint8_t	sHexFileBuffer[kHexFileBufferSize];
+static uint8_t*	sHexFileBufferPtr;
+static uint8_t*	sHexFileEOBPtr;
+
 #define MAX_HEX_LINE_LEN	45
 static uint8_t	sLineBuffer[MAX_HEX_LINE_LEN];
 static uint8_t*	sLineBufferPtr;
 static uint8_t*	sEndOfLineBufferPtr;
 static SdFile	hexFile;
-const uint32_t	kHexFileBufferSize = 128;
-static uint8_t	sHexFileBuffer[kHexFileBufferSize];
-static uint8_t*	sHexFileBufferPtr;
-static uint8_t*	sHexFileEOBPtr;
+
+void HexCopy(void);
+void FullErase(void);
 
 /******************************* DumpJDECInfo *********************************/
 void DumpJDECInfo(void)
 {
-	uint32_t capacity = flash.GetCapacity();
+	uint32_t capacity = norFlash.GetCapacity();
 	if (capacity > 0xFF)
 	{
-		if (flash.GetManufacturerID() == 0xEF)
+		if (norFlash.GetManufacturerID() == 0xEF)
 		{
 			Serial.print(F("Winbond"));
 		} else
 		{
 			Serial.print(F("Unknown manufacturer = 0x"));
-			Serial.print(flash.GetManufacturerID(), HEX);
+			Serial.print(norFlash.GetManufacturerID(), HEX);
 		}
-		if (flash.GetMemoryType() == 0x40)
+		if (norFlash.GetMemoryType() == 0x40)
 		{
 			Serial.print(F(", NOR Flash"));
 		} else
 		{
 			Serial.print(F(", unknown type = 0x"));
-			Serial.print(flash.GetMemoryType(), HEX);
+			Serial.print(norFlash.GetMemoryType(), HEX);
 		}
 		Serial.print(F(", capacity = "));
 		Serial.print(capacity/0x100000);
@@ -140,7 +154,7 @@ void setup(void)
 	{
 		Serial.println(F("SD card not initialized."));
 	}
-	flash.begin();
+	norFlash.begin();
 	DumpJDECInfo();
 }
 
@@ -193,7 +207,7 @@ void loop()
 			Serial.println(F("Verify after write OFF"));
 			break;
 		case 'j':
-			flash.LoadJEDECInfo();
+			norFlash.LoadJEDECInfo();
 			DumpJDECInfo();
 			break;
 	}
@@ -202,7 +216,7 @@ void loop()
 /******************************** FullErase ***********************************/
 void FullErase(void)
 {
-	Serial.println(flash.ChipErase() ? F("*") : F("?Erase chip failed"));
+	Serial.println(norFlash.ChipErase() ? F("*") : F("?Erase chip failed"));
 }
 
 /******************************* ClearBuffer **********************************/
@@ -236,7 +250,7 @@ bool WriteBlock(
 			(address/0x10000) != sCurrent64KBlk)
 		{
 			sCurrent64KBlk = address/0x10000;
-			success = flash.Erase64KBlock(address);
+			success = norFlash.Erase64KBlock(address);
 			if (success)
 			{
 				Serial.write('=');
@@ -245,24 +259,24 @@ bool WriteBlock(
 		//Serial.write('-');
 		if (success)
 		{
-			success = flash.WritePage(address, inData) &&
-						flash.WritePage(address+256, &inData[256]);
+			success = norFlash.WritePage(address, inData) &&
+						norFlash.WritePage(address+256, &inData[256]);
 			if (sVerifyAfterWrite)
 			{
 				uint8_t	verifyBuff[256];
 				#if 0
-				success = flash.Read(address, 256, verifyBuff) &&
+				success = norFlash.Read(address, 256, verifyBuff) &&
 					memcmp(inData, verifyBuff, 256) == 0 &&
-					flash.Read(address+256, 256, verifyBuff) &&
+					norFlash.Read(address+256, 256, verifyBuff) &&
 					memcmp(&inData[256], verifyBuff, 256) == 0;
 				#else
-				success = flash.Read(address, 256, verifyBuff);
+				success = norFlash.Read(address, 256, verifyBuff);
 				if (success)
 				{
 					success = memcmp(inData, verifyBuff, 256) == 0;
 					if (success)
 					{
-						success = flash.Read(address+256, 256, verifyBuff);
+						success = norFlash.Read(address+256, 256, verifyBuff);
 						if (success)
 						{
 							success = memcmp(&inData[256], verifyBuff, 256) == 0;

@@ -19,6 +19,7 @@
 		DA73EC0C1FFA7BDC00CF1812 /* FatFsToHexWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DA73EC0A1FFA7BDC00CF1812 /* FatFsToHexWindowController.xib */; };
 		DA73EC0F1FFAC98D00CF1812 /* StorageAccess.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA73EC0D1FFAC98D00CF1812 /* StorageAccess.mm */; };
 		DA73EC171FFACBCB00CF1812 /* ff.c in Sources */ = {isa = PBXBuildFile; fileRef = DA73EC111FFACBCB00CF1812 /* ff.c */; };
+		DA7C2A60218DE511000BBED7 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DA73EBFF1FFA79A400CF1812 /* Info.plist */; };
 		DA86AEB71FFBE05700D4D645 /* SerialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA86AEB51FFBE05700D4D645 /* SerialViewController.m */; };
 		DA86AEB81FFBE05700D4D645 /* FatFsSerialViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DA86AEB61FFBE05700D4D645 /* FatFsSerialViewController.xib */; };
 		DA86AEBB1FFBED5A00D4D645 /* ORSSerial.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA86AEBA1FFBED5A00D4D645 /* ORSSerial.framework */; };
@@ -241,6 +242,7 @@
 				DA86AEBD1FFC13F400D4D645 /* defaults.plist in Resources */,
 				DA73EBFE1FFA79A400CF1812 /* MainMenu.xib in Resources */,
 				DA73EC0C1FFA7BDC00CF1812 /* FatFsToHexWindowController.xib in Resources */,
+				DA7C2A60218DE511000BBED7 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
