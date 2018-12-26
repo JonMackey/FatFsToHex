@@ -56,7 +56,7 @@
 //#define FREQUENCY         RF69_915MHZ
 
 /*
-*	The Varmint Alert code goes to sleep for n clock cycles if no alert has been
+*	The Varmint Detector code goes to sleep for n clock cycles if no alert has been
 *	triggered to save power.
 *	When the VA code wakes up from sleep, it first waits for the channel to
 *	clear, then sends a query message using the special broadcast ID.  This
