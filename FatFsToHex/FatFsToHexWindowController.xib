@@ -126,13 +126,13 @@
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="Root" identifier="" id="hLJ-Hj-puF">
-                                <view key="view" id="Wn9-WE-Yha" userLabel="Root View">
+                                <view key="view" ambiguous="YES" id="Wn9-WE-Yha" userLabel="Root View">
                                     <rect key="frame" x="10" y="33" width="498" height="289"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Serial" identifier="" id="WsW-aN-8HR">
-                                <view key="view" ambiguous="YES" id="EBp-J2-SuJ">
+                                <view key="view" id="EBp-J2-SuJ">
                                     <rect key="frame" x="10" y="33" width="498" height="289"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </view>
@@ -148,7 +148,7 @@
                             <color key="backgroundColor" red="0.89803921568627454" green="0.92549019607843142" blue="0.97254901960784312" alpha="1" colorSpace="deviceRGB"/>
                         </pathCell>
                         <connections>
-                            <binding destination="-2" name="value" keyPath="archivePath" id="ECk-6a-k59"/>
+                            <binding destination="-2" name="value" keyPath="self.archiveURL" id="IE6-tK-DVL"/>
                         </connections>
                     </pathControl>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KmH-lL-PhJ">

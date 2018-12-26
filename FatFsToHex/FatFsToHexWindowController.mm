@@ -121,7 +121,10 @@
 	__block BOOL	success = StorageAccess::GetInstance()->Format();
 	if (success)
 	{
+		BOOL exportNamesAsIndex = ((NSNumber*)[[NSUserDefaults standardUserDefaults] objectForKey:@"exportNamesAsIndex"]).boolValue;
+		__block NSInteger	nameAsIndex = exportNamesAsIndex ? 0:-1; // -1 means don't export name as index, use actual name
 		NSArray*	rootFiles = self.fatFsTableViewController.rootFiles;
+		__block NSInteger	dirNameAsIndex = nameAsIndex;
 		[rootFiles enumerateObjectsUsingBlock:
 			^(NSDictionary* inDictionary, NSUInteger inIndex, BOOL *outStop)
 			{
@@ -134,13 +137,26 @@
 					[fileURL startAccessingSecurityScopedResource];
 					char	dosName[15];
 					// fatPath = NULL = root
-					if ([fileURL hasDirectoryPath] ? [self addFolder:fileURL fatPath:nil dosName:dosName] :
-						 [self addFile:fileURL fatPath:nil dosName:dosName])
+					if ([fileURL hasDirectoryPath])
+					{
+						success = [self addFolder:fileURL fatPath:nil dosName:dosName nameAsIndex:dirNameAsIndex];
+						if (dirNameAsIndex >= 0)
+						{
+							dirNameAsIndex++;
+						}
+					} else
+					{
+						success = [self addFile:fileURL fatPath:nil dosName:dosName nameAsIndex:nameAsIndex];
+						if (nameAsIndex >= 0)
+						{
+							nameAsIndex++;
+						}
+					}
+					if (success)
 					{
 						[[self fatFsTableViewController] setDosName:[NSString stringWithUTF8String:dosName] forIndex:inIndex];
 					} else
 					{
-						success = NO;
 						*outStop = YES;
 					}
 					
@@ -166,11 +182,21 @@
 }
 
 /********************************* addFile ************************************/
-- (BOOL)addFile:(NSURL*)inURL fatPath:(NSString*)inFatPath dosName:(char*)outDosName
+- (BOOL)addFile:(NSURL*)inURL fatPath:(NSString*)inFatPath dosName:(char*)outDosName nameAsIndex:(NSInteger)inNameAsIndex
 {
-	char*	fatPath = [self allocUTF8StrFor:inFatPath ? [inFatPath stringByAppendingPathComponent:inURL.path.lastPathComponent] : inURL.path.lastPathComponent];
+	char*	fatPath;
+	if (inNameAsIndex < 0)
+	{
+		fatPath = [self allocUTF8StrFor:inFatPath ? [inFatPath stringByAppendingPathComponent:inURL.path.lastPathComponent] : inURL.path.lastPathComponent];
+	} else
+	{
+		NSString*	nameAsIndex = [NSString stringWithFormat:@"%ld.%@", inNameAsIndex, inURL.path.pathExtension];
+		fatPath = [self allocUTF8StrFor:inFatPath ? [inFatPath stringByAppendingPathComponent:nameAsIndex] : nameAsIndex];
+	}
 	char*	path = [self allocUTF8StrFor:inURL.path];
+#ifdef DEBUG
 	fprintf(stderr, "%s\n", fatPath);
+#endif
 	BOOL success = StorageAccess::GetInstance()->AddFile(path, fatPath, outDosName);
 
 	delete [] fatPath;
@@ -180,11 +206,21 @@
 }
 
 /******************************** addFolder ***********************************/
-- (BOOL)addFolder:(NSURL*)inURL fatPath:(NSString*)inFatPath  dosName:(char*)outDosName
+- (BOOL)addFolder:(NSURL*)inURL fatPath:(NSString*)inFatPath  dosName:(char*)outDosName nameAsIndex:(NSInteger)inNameAsIndex
 {
-	NSString*	nsFatPath = inFatPath ? [inFatPath stringByAppendingPathComponent:inURL.path.lastPathComponent] : inURL.path.lastPathComponent;
+	NSString*	nsFatPath;
+	if (inNameAsIndex < 0)
+	{
+		nsFatPath  = inFatPath ? [inFatPath stringByAppendingPathComponent:inURL.path.lastPathComponent] : inURL.path.lastPathComponent;
+	} else
+	{
+		NSString*	nameAsIndex = [NSString stringWithFormat:@"%ld", inNameAsIndex];
+		nsFatPath  = inFatPath ? [inFatPath stringByAppendingPathComponent:nameAsIndex] : nameAsIndex;
+	}
 	char*	fatPath = [self allocUTF8StrFor:nsFatPath];
+#ifdef DEBUG
 	fprintf(stderr, "%s\n", fatPath);
+#endif
 	BOOL success = StorageAccess::GetInstance()->CreateFolder(fatPath, outDosName);
 	delete [] fatPath;
 	
@@ -197,14 +233,29 @@
 					errorHandler:nil];
 
 		[directoryEnumerator skipDescendants];
-
+		
+		NSInteger	dirNameAsIndex = inNameAsIndex < 0 ? -1:0;
+		NSInteger	fileNameAsIndex = inNameAsIndex < 0 ? -1:0;
 		for (NSURL* fileURL in directoryEnumerator)
 		{
 			NSNumber*	isDirectory = nil;
 			[fileURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
 
-			success = [isDirectory boolValue] ? [self addFolder:fileURL fatPath:nsFatPath dosName:nil] :
-													[self addFile:fileURL fatPath:nsFatPath dosName:nil];
+			if ([isDirectory boolValue])
+			{
+				success = [self addFolder:fileURL fatPath:nsFatPath dosName:nil nameAsIndex:dirNameAsIndex];
+				if (dirNameAsIndex >= 0)
+				{
+					dirNameAsIndex++;
+				}
+			} else
+			{
+				success = [self addFile:fileURL fatPath:nsFatPath dosName:nil nameAsIndex:fileNameAsIndex];
+				if (fileNameAsIndex >= 0)
+				{
+					fileNameAsIndex++;
+				}
+			}
 			if (success)
 			{
 				continue;
@@ -248,7 +299,7 @@
 {
 	// Test for dirty, warn user of potential loss... TBD
 	
-	self.archivePath = @"";
+	self.archiveURL = [NSURL URLWithString:@""];
 	self.savedBM = NULL;
 	[self.fatFsTableViewController clearTable];
 }
@@ -391,7 +442,8 @@
 		self.savedBM = [inDocURL bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
 				includingResourceValuesForKeys:NULL relativeToURL:NULL error:&error];
 		[[NSUserDefaults standardUserDefaults] setObject:self.savedBM forKey:@"docURLBM"];
-		self.archivePath = inDocURL.path;
+		self.archiveURL = inDocURL;
+		[[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL:inDocURL];
 		if (error)
 		{
 			NSLog(@"-doSave- %@\n", error);
@@ -430,7 +482,7 @@
 						setObject:[urls[0] bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
 							includingResourceValuesForKeys:NULL relativeToURL:NULL error:NULL]
 								forKey:@"docURLBM"];
-					[self doOpen];
+					[self doOpen:urls[0]];
 				}
 			}
 		}];
@@ -438,28 +490,27 @@
 }
 
 /********************************* doOpen *************************************/
-- (void)doOpen
+- (void)doOpen:(NSURL*)inDocURL
 {
-	self.savedBM = [[NSUserDefaults standardUserDefaults] objectForKey:@"docURLBM"];
-	NSURL*	docURL = [NSURL URLByResolvingBookmarkData:
-	 					self.savedBM
-	 						options:NSURLBookmarkResolutionWithoutUI+NSURLBookmarkResolutionWithoutMounting+NSURLBookmarkResolutionWithSecurityScope
-	 							relativeToURL:NULL bookmarkDataIsStale:NULL error:NULL];
-	[docURL startAccessingSecurityScopedResource];
-	NSDictionary* docDict = [NSKeyedUnarchiver unarchiveObjectWithFile:[docURL path]];
-	[docURL stopAccessingSecurityScopedResource];
-	if (docDict)
+	if (inDocURL)
 	{
-		NSString*	label = [docDict objectForKey:@"volumeName"];
-		NSNumber*	blockSize = [docDict objectForKey:@"blockSize"];
-		NSNumber*	pageSize = [docDict objectForKey:@"pageSize"];
-		NSNumber*	volumeSize = [docDict objectForKey:@"volumeSize"];
-		[[NSUserDefaults standardUserDefaults] setObject:label forKey:@"volumeName"];
-		[[NSUserDefaults standardUserDefaults] setObject:blockSize forKey:@"blockSize"];
-		[[NSUserDefaults standardUserDefaults] setObject:pageSize forKey:@"pageSize"];
-		[[NSUserDefaults standardUserDefaults] setObject:volumeSize forKey:@"volumeSize"];
-		self.fatFsTableViewController.rootFiles = [NSMutableArray arrayWithArray:[docDict objectForKey:@"rootFiles"]];
-		self.archivePath = docURL.path;
+		[inDocURL startAccessingSecurityScopedResource];
+		NSDictionary* docDict = [NSKeyedUnarchiver unarchiveObjectWithFile:[inDocURL path]];
+		[inDocURL stopAccessingSecurityScopedResource];
+		if (docDict)
+		{
+			NSString*	label = [docDict objectForKey:@"volumeName"];
+			NSNumber*	blockSize = [docDict objectForKey:@"blockSize"];
+			NSNumber*	pageSize = [docDict objectForKey:@"pageSize"];
+			NSNumber*	volumeSize = [docDict objectForKey:@"volumeSize"];
+			[[NSUserDefaults standardUserDefaults] setObject:label forKey:@"volumeName"];
+			[[NSUserDefaults standardUserDefaults] setObject:blockSize forKey:@"blockSize"];
+			[[NSUserDefaults standardUserDefaults] setObject:pageSize forKey:@"pageSize"];
+			[[NSUserDefaults standardUserDefaults] setObject:volumeSize forKey:@"volumeSize"];
+			self.fatFsTableViewController.rootFiles = [NSMutableArray arrayWithArray:[docDict objectForKey:@"rootFiles"]];
+			self.archiveURL = inDocURL;
+			[[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL:inDocURL];
+		}
 	}
 }
 

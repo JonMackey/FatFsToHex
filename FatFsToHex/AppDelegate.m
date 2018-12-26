@@ -51,5 +51,13 @@
 	// Insert code here to tear down your application
 }
 
+/******************************** openURLs ************************************/
+- (void)application:(NSApplication *)inApplication openURLs:(NSArray<NSURL *> *)inUrls
+{
+	if (inUrls.count == 1)
+	{
+		[self.fatFsToHexWindowController doOpen:inUrls[0]];
+	}
+}
 
 @end

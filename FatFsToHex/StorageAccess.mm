@@ -102,21 +102,25 @@ bool StorageAccess::Format(void)
 {
 	ClearBlockMap();
 	// Partition the flash with 1 partition that takes the entire space.
+#ifdef DEBUG
 	fprintf(stderr, "Partitioning flash with 1 primary partition...\n");
+#endif
 	DWORD szt[] = {100, 0, 0, 0};  // 1 primary partition with 100% of space.
 	memset(mBuffer, 0, kBufferSize);
 	FRESULT r = f_fdisk(0, szt, mBuffer);
 	if (r == FR_OK)
 	{
+#ifdef DEBUG
 		fprintf(stderr, "Partitioned flash!\n");
-
 		// Make filesystem.
 		fprintf(stderr, "Creating and formatting FAT filesystem...\n");
+#endif
 		r = f_mkfs("", FM_ANY, 0, mBuffer, kBufferSize);
 		if (r == FR_OK)
 		{
+#ifdef DEBUG
 			fprintf(stderr, "Formatted flash!\n");
-
+#endif
 			// Finally test that the filesystem can be mounted.
 			if (Begin())
 			{
@@ -127,6 +131,7 @@ bool StorageAccess::Format(void)
 					char labelName[20];
 					[label getCString:labelName maxLength:20 encoding:NSUTF8StringEncoding];
 					r = f_setlabel(labelName);
+#ifdef DEBUG
 					if (r == FR_OK)
 					{
 						fprintf(stderr, "Volume label set to \"%s\".\n", labelName);
@@ -134,18 +139,25 @@ bool StorageAccess::Format(void)
 					{
 						fprintf(stderr, "Error, failed to set volume label to \"%s\"!,  error code: %d\n", labelName, (int)r);
 					}
+#endif
 				}
+#ifdef DEBUG
 			} else
 			{
 				fprintf(stderr, "Error, failed to mount newly formatted filesystem!\n");
+#endif
 			}
+#ifdef DEBUG
 		} else
 		{
 			fprintf(stderr, "Error, f_mkfs failed with error code: %d\n", (int)r);
+#endif
 		}
+#ifdef DEBUG
 	} else
 	{
 		fprintf(stderr, "Error, f_fdisk failed with error code: %d\n", (int)r);
+#endif
 	}
 	return(r == FR_OK);
 }
@@ -182,7 +194,9 @@ bool StorageAccess::AddFile(
 					}
 					break;
 				}
+#ifdef DEBUG
 				fprintf(stderr, "Bytes read = %d, bytes written = %d\n", (int)totalBytesRead, totalBytesWritten);
+#endif
 				f_close(&fp);
 				if (r == FR_OK &&
 					outDosName)
@@ -194,9 +208,11 @@ bool StorageAccess::AddFile(
 						memcpy(outDosName, fileInfo.altname, FF_SFN_BUF + 1);
 					}
 				}
+#ifdef DEBUG
 			} else
 			{
 				fprintf(stderr, "f_open failed with error code: %d\n", (int)r);
+#endif
 			}
 		}
 		fclose(file);
@@ -395,10 +411,14 @@ bool StorageAccess::Begin(void)
 	FRESULT r = f_mount(&mFatFs, "", 1);
 	if (r != FR_OK)
 	{
+#ifdef DEBUG
 		fprintf(stderr, "f_mount failed with error code: %d\n", (int)r);
+#endif
 		return false;
 	}
+#ifdef DEBUG
 	fprintf(stderr, "Volume mounted!\n");
+#endif
 	return true;
 }
 
@@ -414,7 +434,9 @@ void StorageAccess::ClearBlockMap(void)
 	}
 	mBlockMap.clear();
 	mBlockSize = 0;
+#ifdef DEBUG
 	fprintf(stderr, "ClearBlockMap - cleared\n");
+#endif
 }
 
 /****************************** GetDiskStatus *********************************/
@@ -432,7 +454,9 @@ DSTATUS StorageAccess::InitializeDisk(void)
 	mPageSize = pageSize.intValue;
 	NSNumber*	volumeSize = [[NSUserDefaults standardUserDefaults] objectForKey:@"volumeSize"];
 	mVolumeSize = volumeSize.intValue * 0x100000;
+#ifdef DEBUG
 	fprintf(stderr, "InitializeDisk mBlockSize = %d, mPageSize = %d, mVolumeSize = %d\n", mBlockSize, mPageSize, mVolumeSize);
+#endif
 	return(0);
 }
 
@@ -461,7 +485,9 @@ DRESULT StorageAccess::DiskRead(
 	UINT	inCount,
 	BYTE*	outBuffer)
 {
+#ifdef DEBUG
 	fprintf(stderr, "DiskRead(%X, %d)\n", (int)inSector, (int)inCount);
+#endif
 	uint8_t*	bufferPtr = outBuffer;
 	uint8_t*	blockPtr;
 	for (uint32_t i = 0; i < inCount; i++)
@@ -485,7 +511,9 @@ DRESULT StorageAccess::DiskWrite(
 	UINT		inCount,
 	const BYTE*	inBuffer)
 {
+#ifdef DEBUG
 	fprintf(stderr, "DiskWrite(%X, %d)\n", (int)inSector, (int)inCount);
+#endif
 	const uint8_t*	bufferPtr = inBuffer;
 	uint8_t*	blockPtr;
 	for (uint32_t i = 0; i < inCount; i++)

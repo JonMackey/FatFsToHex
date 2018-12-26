@@ -37,7 +37,8 @@
 	IBOutlet NSView *serialView;
 }
 @property (nonatomic, strong) NSData *savedBM;
-@property (nonatomic, strong) NSString *archivePath;
+@property (nonatomic, strong) NSURL *archiveURL;
 @property (nonatomic, strong) FatFsSerialViewController *fatFsSerialViewController;
 @property (nonatomic, strong) FatFsTableViewController *fatFsTableViewController;
+- (void)doOpen:(NSURL*)inDocURL;
 @end
