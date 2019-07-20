@@ -2,7 +2,7 @@
 
 FatFsToHex is a small Objective-C OS X app used to create a FAT file system to be sent serially in Intel HEX format to any compatible interpreter.
 
-<b>Note that in a future version the ability to send serially from this app will be removed.</b>  For sending serially, use [SerialHexLoader](https://github.com/JonMackey/SubsetFontCreator) instead.
+<b>Note that in a future version the ability to send serially from this app will be removed.</b>  For sending serially, use [SerialHexLoader](https://github.com/JonMackey/SerialHexLoader) instead.
 
 In my case the HEX is sent to an Atmel ATmega328p that unpacks and copies the blocks sent to a target device.  Currently this is either NOR Flash or an SD card.
 
