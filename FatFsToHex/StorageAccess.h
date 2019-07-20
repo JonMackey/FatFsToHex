@@ -75,6 +75,8 @@ public:
 								{return(mVolumeSize);}
 	bool					SaveToHexFile(
 								const char*				inPath);
+	bool					SaveToFile(
+								const char*				inPath);
 	bool					Format(void);
 	bool					AddFile(
 								const char*				inSrcPath,

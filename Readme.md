@@ -33,6 +33,9 @@ Note that the type of FAT created by FatFs depends on the volume size (FAT16, FA
 
 Once you've defined the files and their physical order in the root folder, you can either export a hex file to disk so that you can use some other method of loading the  target device, or you can move to the Serial panel to load the data serially using the HexLoader sketch. 
 
+Export also has the option of exporting a binary of the FatFS.  This file can either be copied to an SD Card or used with my SerialHexLoader MacOS app..  
+The SerialHexLoader app was written after FatFsToHex.  SerialHexLoader performs the same function as the Serial panel in FatFsToHex with some added features such as a slightly better algorithm for omitting nulls resulting in less serial traffic.  In fact, if FatFsToHex didn't have "hex" in its name I would have removed the serial hex feature and just have it export binary only.
+
 ![Image](SerialPanel.png)
 
 Load the HexLoader sketch onto any Atmel ATmega328p.  Hookup the device to the 328p as per the pin settings in the sketch.  As currently configured, the baud rate is 19200 (anything higher and you may have Rx issues.)  The HexLoader sketch currently accepts the following commands, H, E, V, v, and j.  H starts a hex load session and E does a full erase on the target device.  When you press the Send FatFs button an H is automatically sent.  To do a full erase you need to type a capital E into the send text field and press send with append CR selected (to the right of the Send button).  The V command set a flag to do a read after write verify (default.)  The v command turns verify off.  The j command reads and displays the NOR Flash JDEC information (a way of pinging the chip.)

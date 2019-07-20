@@ -40,5 +40,8 @@
 @property (nonatomic, strong) NSURL *archiveURL;
 @property (nonatomic, strong) FatFsSerialViewController *fatFsSerialViewController;
 @property (nonatomic, strong) FatFsTableViewController *fatFsTableViewController;
+@property (nonatomic, strong) NSViewController *formatViewController;
+@property (nonatomic, weak) NSSavePanel *savePanel; // valid only while panel is open
+
 - (void)doOpen:(NSURL*)inDocURL;
 @end

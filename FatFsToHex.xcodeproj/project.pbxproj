@@ -30,6 +30,7 @@
 		DABBA2681FFD306100D65809 /* FatFsSerialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DABBA2671FFD306100D65809 /* FatFsSerialViewController.m */; };
 		DABBA26C1FFD6DF400D65809 /* FatFsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DABBA26A1FFD6DF400D65809 /* FatFsTableViewController.m */; };
 		DABBA26D1FFD6DF400D65809 /* FatFsTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DABBA26B1FFD6DF400D65809 /* FatFsTableViewController.xib */; };
+		DAF24E1722AC2A9400497F67 /* ExportFormat.xib in Resources */ = {isa = PBXBuildFile; fileRef = DAF24E1622AC2A9300497F67 /* ExportFormat.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -85,6 +86,7 @@
 		DABBA2691FFD6DF400D65809 /* FatFsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FatFsTableViewController.h; sourceTree = "<group>"; };
 		DABBA26A1FFD6DF400D65809 /* FatFsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FatFsTableViewController.m; sourceTree = "<group>"; };
 		DABBA26B1FFD6DF400D65809 /* FatFsTableViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FatFsTableViewController.xib; sourceTree = "<group>"; };
+		DAF24E1622AC2A9300497F67 /* ExportFormat.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ExportFormat.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,6 +152,7 @@
 				DA2D41F820C8927C0089BFA7 /* Tabs.h */,
 				DA2D41F720C8927B0089BFA7 /* Tabs.mm */,
 				DA86AEBC1FFC13F400D4D645 /* defaults.plist */,
+				DAF24E1622AC2A9300497F67 /* ExportFormat.xib */,
 				DA73EC101FFACB4F00CF1812 /* FatFs */,
 			);
 			path = FatFsToHex;
@@ -240,6 +243,7 @@
 				DA86AEB81FFBE05700D4D645 /* FatFsSerialViewController.xib in Resources */,
 				DA73EBFB1FFA79A400CF1812 /* Assets.xcassets in Resources */,
 				DA86AEBD1FFC13F400D4D645 /* defaults.plist in Resources */,
+				DAF24E1722AC2A9400497F67 /* ExportFormat.xib in Resources */,
 				DA73EBFE1FFA79A400CF1812 /* MainMenu.xib in Resources */,
 				DA73EC0C1FFA7BDC00CF1812 /* FatFsToHexWindowController.xib in Resources */,
 				DA7C2A60218DE511000BBED7 /* Info.plist in Resources */,

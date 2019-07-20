@@ -404,6 +404,47 @@ bool StorageAccess::SaveToHexFile(
 	return(success);
 }
 
+/********************************* SaveToFile *********************************/
+bool StorageAccess::SaveToFile(
+	const char*	inPath)
+{
+	bool success = false;
+	FILE*    file = fopen(inPath, "w");
+	if (file)
+	{
+		BlockMap::iterator	itr = mBlockMap.begin();
+		BlockMap::iterator	itrEnd = mBlockMap.end();
+		/*
+		*	FatFs only initializes blocks that it uses.  The block map indexes
+		*	may have gaps of unused blocks.   The blocks that aren't used need
+		*	to be written to the file.  These blocks could be written as random
+		*	data but this would limit the optimization of anything that copies
+		*	the file.  It also makes the file less readable for debugging.  For
+		*	this reason empty blocks are zeroed.
+		*/
+		uint32_t	nextBlockIndex = 0;
+		uint8_t*	emptyBlock = new uint8_t[mBlockSize];
+		memset(emptyBlock, 0, mBlockSize);
+		for (; itr != itrEnd; ++itr)
+		{
+			uint32_t	emptyBlocks = itr->first - nextBlockIndex;
+			if (emptyBlocks)
+			{
+				for (uint32_t i = 0; i < emptyBlocks; i++)
+				{
+					fwrite(emptyBlock, 1, mBlockSize, file);
+				}
+			}
+			nextBlockIndex = itr->first+1;
+			fwrite(itr->second, 1, mBlockSize, file);
+		}
+		delete [] emptyBlock;
+		fclose(file);
+		success = true;
+	}
+	return(success);
+}
+
 /********************************** Begin *************************************/
 bool StorageAccess::Begin(void)
 {

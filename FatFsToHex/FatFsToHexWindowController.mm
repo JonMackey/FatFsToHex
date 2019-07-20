@@ -35,6 +35,7 @@
 @end
 
 @implementation FatFsToHexWindowController
+NSString *const kLastExportTypeKey = @"lastExportType";
 
 - (void)windowDidLoad
 {
@@ -71,7 +72,7 @@
 	{
 		// Assign this object as the target.
 		exportMenuItem.target = self;
-		exportMenuItem.action = @selector(exportHex:);
+		exportMenuItem.action = @selector(exportFatFs:);
 	}
 
 	NSMenuItem *newMenuItem = [[[NSApplication sharedApplication].mainMenu itemAtIndex:1].submenu itemWithTag:555];
@@ -109,6 +110,13 @@
 		[[self.fatFsSerialViewController view] setFrame:[serialView bounds]];
 	}
 	
+	if (self.formatViewController == nil)
+	{
+		_formatViewController  = [[NSViewController alloc] initWithNibName:@"ExportFormat" bundle:nil];
+		NSPopUpButton* formatPopupBtn = [_formatViewController.view viewWithTag:2];
+		formatPopupBtn.action = @selector(changeFormat:);
+		formatPopupBtn.target = self;
+	}
 	// Create an instance of StorageAccess
 	StorageAccess::Create();
 	
@@ -355,8 +363,32 @@
 	return(success);
 }
 
-/********************************* exportHex **********************************/
-- (IBAction)exportHex:(id)sender
+/****************************** exportBinaryFile ******************************/
+- (BOOL)exportBinaryFile:(NSURL*)inDocURL
+{
+	BOOL	success = NO;
+	if (inDocURL)
+	{
+		if ([self createFatFs])
+		{
+			char*	path = [self allocUTF8StrFor:inDocURL.path];
+			success = StorageAccess::GetInstance()->SaveToFile(path);
+			delete [] path;
+		}
+	}
+	return(success);
+}
+
+/****************************** changeFormat **********************************/
+- (IBAction)changeFormat:(id)sender
+{
+	NSPopUpButton* formatPopupBtn = sender;
+	NSUInteger typeIndex = formatPopupBtn.indexOfSelectedItem;
+	_savePanel.allowedFileTypes = @[[@[@"hex", @"fimg"] objectAtIndex:typeIndex]];
+}
+
+/******************************** exportFatFs *********************************/
+- (IBAction)exportFatFs:(id)sender
 {
 	NSURL*	docURL = NULL;
 	NSData*	docURLBM = [[NSUserDefaults standardUserDefaults] objectForKey:@"docURLBM"];
@@ -368,20 +400,42 @@
 	}
 	NSURL*	baseURL = docURL ? [NSURL fileURLWithPath:[[docURL path] stringByDeletingLastPathComponent] isDirectory:YES] : NULL;
 	NSString*	initialName = docURL ? [[[docURL path] lastPathComponent] stringByDeletingPathExtension] : @"Untitled";
-	NSSavePanel*	savePanel = [NSSavePanel savePanel];
-	if (savePanel)
+	_savePanel = [NSSavePanel savePanel];
+	if (_savePanel)
 	{
-		savePanel.directoryURL = baseURL;
-		savePanel.allowedFileTypes = @[@"hex"];
-		savePanel.nameFieldStringValue = initialName;
-		[savePanel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result)
+		_savePanel.directoryURL = baseURL;
+		_savePanel.accessoryView = _formatViewController.view;
+		NSString* lastExportType = [[NSUserDefaults standardUserDefaults] objectForKey:kLastExportTypeKey];
+		__block NSArray* exportTypes = @[@"hex", @"fimg"]; // << must match menu item order in popup button
+		__block NSURL* exportURL = nil;
+		NSPopUpButton* formatPopupBtn = [_formatViewController.view viewWithTag:2];
+		__block NSUInteger typeIndex = [exportTypes indexOfObject:lastExportType];
+		if (typeIndex < 0 || typeIndex >= formatPopupBtn.menu.numberOfItems)
+		{
+			typeIndex = 0;
+		}
+		[formatPopupBtn selectItemAtIndex:typeIndex];
+		_savePanel.allowedFileTypes = @[[exportTypes objectAtIndex:typeIndex]];
+		_savePanel.nameFieldStringValue = initialName;
+		[_savePanel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result)
 		{
 			if (result == NSModalResponseOK)
 			{
-				NSURL* docURL = savePanel.URL;
-				[docURL startAccessingSecurityScopedResource];
-				[self exportHexFile:docURL];
-				[docURL stopAccessingSecurityScopedResource];
+				exportURL = _savePanel.URL;
+				typeIndex = formatPopupBtn.indexOfSelectedItem;
+				[[NSUserDefaults standardUserDefaults] setObject:[exportTypes objectAtIndex:typeIndex] forKey:kLastExportTypeKey];
+				[self.savePanel orderOut:nil];
+				[exportURL startAccessingSecurityScopedResource];
+				switch (typeIndex)
+				{
+					case 0:
+						[self exportHexFile:exportURL];
+						break;
+					case 1:
+						[self exportBinaryFile:exportURL];
+						break;
+				}
+				[exportURL stopAccessingSecurityScopedResource];
 			}
 		}];
 	}
