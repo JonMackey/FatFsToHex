@@ -35,15 +35,20 @@
 	self = [super init];
 	if (self)
 	{
+		// ARC takes care of nulling any strong properties
 		_data = inData;
 		_serialPort = inPort;
+		_idleTime = 0;
+		_timeout = 0;
+		_stoppedDueToTimeout = NO;
+		_stoppedDueToError = NO;
 	}
 	return(self);
 }
 
 - (void)dealloc
 {
-    fprintf(stderr, "dealloc SerialPortIOSession\n");
+   // fprintf(stderr, "dealloc SerialPortIOSession\n");
 }
 
 /********************************** begin *************************************/
@@ -53,16 +58,10 @@
 	_stopped = NO;
 }
 
-/********************************** begin *************************************/
+/******************************* didReceiveData *******************************/
 - (NSData*)didReceiveData:(NSData *)inData
 {
 	return(inData);
-}
-
-/********************************* isDone *************************************/
-- (BOOL)isDone
-{
-	return(_done);
 }
 
 /********************************** stop **************************************/
@@ -72,10 +71,25 @@
 	_stopped = YES;
 }
 
-/******************************* wasStopped ***********************************/
-- (BOOL)wasStopped
+/******************************* setTimeout ********************************/
+/*
+*	Override of setter function for _timeout
+*/
+- (void)setTimeout:(NSUInteger)inTimeoutSeconds
 {
-	return(_stopped);
+	_idleTime = 0;
+	_timeout = inTimeoutSeconds;
 }
 
+/******************************** timeoutCheck ********************************/
+- (void)timeoutCheck
+{
+	_idleTime++;
+	if (_idleTime > _timeout)
+	{
+		// override setter to set a specific timeout error string
+		self.stoppedDueToTimeout = YES;
+		_done = YES;
+	}
+}
 @end

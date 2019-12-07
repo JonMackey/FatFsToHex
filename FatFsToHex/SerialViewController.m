@@ -202,21 +202,27 @@
 /********************************** send **************************************/
 - (IBAction)send:(id)sender
 {
-	if ([self portIsOpen:YES])
+	[self sendString:self.sendTextField.stringValue];
+}
+
+/******************************* sendString ***********************************/
+- (BOOL)sendString:(NSString*)inStringToSend
+{
+	BOOL success = [self portIsOpen:YES];
+	if (success)
 	{
 		NSData *dataToSend = NULL;
-		NSString *string = self.sendTextField.stringValue;
 		
 		if (self.sendAsHex)
 		{
-			dataToSend = [self toBinary:string];
+			dataToSend = [self toBinary:inStringToSend];
 		} else
 		{
 			if (self.lineEndingPopUpButton.selectedTag)
 			{
-				string = [string stringByAppendingString:[@[@"", @"\n", @"\r", @"r\n"] objectAtIndex:self.lineEndingPopUpButton.selectedTag]];
+				inStringToSend = [inStringToSend stringByAppendingString:[@[@"", @"\n", @"\r", @"r\n"] objectAtIndex:self.lineEndingPopUpButton.selectedTag]];
 			}
-			dataToSend = [string dataUsingEncoding:NSUTF8StringEncoding];
+			dataToSend = [inStringToSend dataUsingEncoding:NSUTF8StringEncoding];
 		}
 		if (dataToSend &&
 			dataToSend.length != 0)
@@ -224,6 +230,7 @@
 			[self.serialPort sendData:dataToSend];
 		}
 	}
+	return(success);
 }
 
 /******************************** openOrClosePort **********************************/
@@ -243,33 +250,70 @@
 
 #pragma mark - ORSSerialPortDelegate Methods
 
+/**************************** serialPortWasOpened *****************************/
 - (void)serialPortWasOpened:(ORSSerialPort *)serialPort
 {
 	self.openCloseButton.title = @"Close";
 	[self postInfoString: [NSString stringWithFormat:@"%@ opened", [self.serialPort name]]];
 }
 
+/**************************** serialPortWasClosed *****************************/
 - (void)serialPortWasClosed:(ORSSerialPort *)serialPort
 {
-	self.serialPortSession = NULL;
+	self.sessionTimer = nil;
+	self.serialPortSession = nil;
 	self.openCloseButton.title = @"Open";
 	[self postInfoString: [NSString stringWithFormat:@"%@ closed", [self.serialPort name]]];
 }
 
+/******************************* sessionIsDone ********************************/
 -(BOOL)sessionIsDone
 {
-	BOOL isDone = [self.serialPortSession isDone];
+	BOOL isDone = self.serialPortSession.isDone;
 	if (isDone)
 	{
-		self.serialPortSession = NULL;
+		self.sessionTimer = nil;	// This also invalidates/stops the timer, if one exists
+		[[NSSound soundNamed:(self.serialPortSession.stoppedDueToError ||
+								self.serialPortSession.stoppedDueToTimeout) ?
+									@"Funk" : @"Glass"] play];
+		
+		if (self.serialPortSession.stoppedDueToError == NO &&
+			self.serialPortSession.stoppedDueToTimeout == NO)
+		{
+			if (self.serialPortSession.completedMsg)
+			{
+				[self postInfoString: self.serialPortSession.completedMsg];
+			}
+			if (self.serialPortSession.completionBlock)
+			{
+				self.serialPortSession.completionBlock(self.serialPortSession);
+			}
+		}
+		self.serialPortSession = nil;
 	}
 	return(isDone);
 }
 
+/****************************** setSessionTimer *******************************/
+/*
+*	Override of setter function for _sessionTimer
+*/
+- (void)setSessionTimer:(NSTimer*)inTimer
+{
+	if (_sessionTimer)
+	{
+		[_sessionTimer invalidate];
+	}
+	_sessionTimer = inTimer;
+}
+
+
+/************************* serialPort:didReceiveData **************************/
 - (void)serialPort:(ORSSerialPort *)serialPort didReceiveData:(NSData *)data
 {
 	if (self.serialPortSession)
 	{
+		self.serialPortSession.idleTime = 0;	// reset the timeout idle time
 		if (![self sessionIsDone])
 		{
 			data = [self.serialPortSession didReceiveData:data];
@@ -354,6 +398,7 @@
 	}
 }
 
+/*********************** serialPortWasRemovedFromSystem ***********************/
 - (void)serialPortWasRemovedFromSystem:(ORSSerialPort *)serialPort;
 {
 	// After a serial port is removed from the system, it is invalid and we must discard any references to it
@@ -361,6 +406,7 @@
 	self.openCloseButton.title = @"Open";
 }
 
+/************************ serialPort:didEncounterError ************************/
 - (void)serialPort:(ORSSerialPort *)serialPort didEncounterError:(NSError *)error
 {
 	//NSLog(@"Serial port %@ encountered an error: %@", serialPort, error);
@@ -376,10 +422,47 @@
 	}
 }
 
+/************************** beginSerialPortIOSession **************************/
+- (void)beginSerialPortIOSession:(SerialPortIOSession*)inSerialPortIOSession clearLog:(BOOL)inClearLog
+{
+	if (inSerialPortIOSession)
+	{
+		if ([self portIsOpen:YES])
+		{
+			if (inClearLog)
+			{
+				[self clear:self];
+			}
+
+			self.serialPortSession = inSerialPortIOSession;
+			inSerialPortIOSession.delegate = self;
+			if (inSerialPortIOSession.timeout)
+			{
+				_sessionTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(timeoutCheck:) userInfo:nil repeats:YES];
+			}
+			if (inSerialPortIOSession.beginMsg)
+			{
+				[self postInfoString:inSerialPortIOSession.beginMsg];
+			}
+			[self.serialPortSession begin];
+		}
+	}
+}
+
+/******************************** timeoutCheck ********************************/
+- (void)timeoutCheck:(NSTimer *)inTimer
+{
+	[self.serialPortSession timeoutCheck];
+	
+	// Check and remove the session if it's done.
+	[self sessionIsDone];
+}
+
 #pragma mark - NSUserNotificationCenterDelegate
 
 #if (MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_7)
 
+/*************** userNotificationCenter:didDeliverNotification ****************/
 - (void)userNotificationCenter:(NSUserNotificationCenter *)center didDeliverNotification:(NSUserNotification *)notification
 {
 	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, 3.0 * NSEC_PER_SEC);
@@ -388,6 +471,7 @@
 	});
 }
 
+/************** userNotificationCenter:shouldPresentNotification **************/
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification
 {
 	return YES;
@@ -397,23 +481,34 @@
 
 #pragma mark - Notifications
 
+/************************** serialPortsWereConnected **************************/
 - (void)serialPortsWereConnected:(NSNotification *)notification
 {
 	NSArray *connectedPorts = [notification userInfo][ORSConnectedSerialPortsKey];
 	//NSLog(@"Ports were connected: %@", connectedPorts);
-	[self postInfoString: [NSString stringWithFormat:@"Ports were connected: %@", connectedPorts]];
+	for (NSUInteger portIndex = connectedPorts.count; portIndex; )
+	{
+		--portIndex;
+		[self postInfoString: [NSString stringWithFormat:@"%@ connected", [connectedPorts objectAtIndex:portIndex]]];
+	}
 	[self postUserNotificationForConnectedPorts:connectedPorts];
 }
 
+/************************ serialPortsWereDisconnected *************************/
 - (void)serialPortsWereDisconnected:(NSNotification *)notification
 {
 	NSArray *disconnectedPorts = [notification userInfo][ORSDisconnectedSerialPortsKey];
 	//NSLog(@"Ports were disconnected: %@", disconnectedPorts);
-	[self postInfoString: [NSString stringWithFormat:@"Ports were disconnected: %@", disconnectedPorts]];
+	for (NSUInteger portIndex = disconnectedPorts.count; portIndex; )
+	{
+		--portIndex;
+		[self postInfoString: [NSString stringWithFormat:@"%@ disconnected", [disconnectedPorts objectAtIndex:portIndex]]];
+	}
 	[self postUserNotificationForDisconnectedPorts:disconnectedPorts];
 	
 }
 
+/******************* postUserNotificationForConnectedPorts ********************/
 - (void)postUserNotificationForConnectedPorts:(NSArray *)connectedPorts
 {
 #if (MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_7)
@@ -432,6 +527,7 @@
 #endif
 }
 
+/****************** postUserNotificationForDisconnectedPorts ******************/
 - (void)postUserNotificationForDisconnectedPorts:(NSArray *)disconnectedPorts
 {
 #if (MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_7)
@@ -450,8 +546,7 @@
 #endif
 }
 
-#pragma mark - Properties
-/***************************** setSerialPort **********************************/
+/******************************* setSerialPort ********************************/
 /*
 *	Override of setter function for _serialPort
 */
@@ -472,5 +567,22 @@
 	}
 }
 
+/******************************* logErrorString *******************************/
+- (void)logErrorString:(nonnull NSString *)inString
+{
+	[self postErrorString:inString];
+}
+
+/******************************* logInfoString ********************************/
+- (void)logInfoString:(nonnull NSString *)inString
+{
+	[self postInfoString:inString];
+}
+
+/****************************** logWarningString ******************************/
+- (void)logWarningString:(nonnull NSString *)inString
+{
+	[self postWarningString:inString];
+}
 @end
 

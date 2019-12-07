@@ -31,13 +31,15 @@
 #import "LogViewController.h"
 #import "SerialPortIOSession.h"
 
-@interface SerialViewController : LogViewController <ORSSerialPortDelegate, NSUserNotificationCenterDelegate>
+@interface SerialViewController : LogViewController <ORSSerialPortDelegate, NSUserNotificationCenterDelegate, LogDelegate>
 - (IBAction)send:(id)sender;
 - (IBAction)openOrClosePort:(id)sender;
 
 - (BOOL)portIsOpen:(BOOL)inReportIfNoConnection;
 - (void)stop;
--(BOOL)sessionIsDone;
+- (BOOL)sessionIsDone;
+- (void)beginSerialPortIOSession:(SerialPortIOSession*)inSerialPortIOSession clearLog:(BOOL)inClearLog;
+- (BOOL)sendString:(NSString*)inStringToSend;
 
 @property (unsafe_unretained) IBOutlet NSTextField *sendTextField;
 @property (unsafe_unretained) IBOutlet NSButton *openCloseButton;
@@ -51,5 +53,5 @@
 @property (nonatomic) BOOL checkForNonPrintableChars;
 @property (nonatomic) BOOL doUTF8Buffering;
 @property (nonatomic, strong) NSMutableData *utf8Buffer;
-
+@property (nonatomic, strong) NSTimer* sessionTimer;
 @end

@@ -1,6 +1,4 @@
-#pragma once
-#ifndef Tabs_H
-#define Tabs_H
+//
 /*******************************************************************************
 	License
 	****************************************************************************
@@ -18,17 +16,19 @@
  
 	Licence can be viewed at
 	http://www.gnu.org/licenses/gpl-3.0.txt
-//
+
 	Please maintain this license information along with authorship
 	and copyright notices in any redistribution of this code
 *******************************************************************************/
-//
-//  Tabs.h
-//  FatFsToHex
-//
-//  Created by Jon Mackey on 1/3/18.
-//  Copyright © 2018 Jon Mackey. All rights reserved.
-//
+/*
+*	Tabs
+*	
+*	Created by Jon Mackey on 4/13/19.
+*	Copyright © 2019 Jon Mackey. All rights reserved.
+*/
+
+#ifndef Tabs_H
+#define Tabs_H
 
 class Tabs
 {

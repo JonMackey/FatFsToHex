@@ -142,6 +142,20 @@
 	return(self);
 }
 
+/***************************** postWithoutScroll ******************************/
+- (LogViewController*)postWithoutScroll
+{
+	if ([self.logText length] > 0)
+	{
+		[self setParaStyle:NULL];
+		[self setColor:NULL];
+		[self.receivedDataTextView.textStorage appendAttributedString:self.logText];
+		[self.receivedDataTextView setNeedsDisplay:YES];
+		[self flush];
+	}
+	return(self);
+}
+
 /*********************************** flush ************************************/
 - (LogViewController*)flush
 {

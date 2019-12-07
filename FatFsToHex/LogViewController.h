@@ -60,6 +60,7 @@
 - (LogViewController*)postWarningString:(NSString*)inString;
 - (LogViewController*)postInfoString:(NSString*)inString;
 - (LogViewController*)post;
+- (LogViewController*)postWithoutScroll;
 - (LogViewController*)flush;
 - (void)setFont:(NSFont*)inFont;	// All text
 - (LogViewController*)setColor:(NSColor*)inColor;
@@ -92,5 +93,6 @@
 - (LogViewController*)appendColoredDate:(NSColor*)inColor date:(NSDate*)inDate;
 - (LogViewController*)appendHexDump:(const void*)inBuffer length:(NSUInteger)inLength addPreamble:(BOOL)inAddPreamble;
 - (BOOL)containsNonPrintableChars:(const void*)inBuffer length:(NSUInteger)inLength;
+- (IBAction)clear:(id)sender;
 
 @end

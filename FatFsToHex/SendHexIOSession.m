@@ -27,6 +27,7 @@
 //  Copyright © 2018 Jon Mackey. All rights reserved.
 //
 
+#import <Cocoa/Cocoa.h>
 #import "SendHexIOSession.h"
 
 @implementation SendHexIOSession
@@ -54,7 +55,7 @@
 /***************************** didReceiveData *********************************/
 - (NSData*)didReceiveData:(NSData *)inData
 {
-	if (!self.done)
+	if (!self.isDone)
 	{
 		//fprintf(stderr, "%.*s\n", (int)inData.length, inData.bytes);
 		int	status = 0;

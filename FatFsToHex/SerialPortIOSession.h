@@ -30,17 +30,39 @@
 #import <Foundation/Foundation.h>
 #import <ORSSerial/ORSSerial.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
+@protocol LogDelegate;
 @interface SerialPortIOSession : NSObject
 
-@property (nonatomic) BOOL done;
-@property (nonatomic) BOOL stopped;
+@property (getter=isDone, nonatomic) BOOL done;
+@property (getter=wasStopped, nonatomic) BOOL stopped;
+@property (nonatomic) BOOL stoppedDueToTimeout;
+@property (nonatomic) BOOL stoppedDueToError;
 @property (nonatomic, strong) ORSSerialPort* serialPort;
-@property (nonatomic, strong) NSData* data;
+@property (nullable, strong) NSData* data;
+@property (nullable, strong) NSString* beginMsg;
+@property (nullable, strong) NSString* completedMsg;
+@property (nonatomic) NSUInteger	idleTime;
+@property (nonatomic) NSUInteger	timeout;
+@property (nullable, weak) id<LogDelegate> delegate;
 
-- (instancetype)initWithData:(NSData *)inData port:(ORSSerialPort *)inPort;
+@property (nonatomic, copy, nullable) void (^completionBlock)(SerialPortIOSession* ioSession);
+@property NSInteger completionTag;
+
+- (instancetype)initWithData:(NSData * _Nullable)inData port:(ORSSerialPort *)inPort;
 - (void)begin;
 - (NSData*)didReceiveData:(NSData *)inData;
-- (BOOL)isDone;
-- (BOOL)wasStopped;
 - (void)stop;
+- (void)timeoutCheck;
 @end
+
+@protocol LogDelegate <NSObject>
+
+@required
+- (void)logErrorString:(NSString*)inString;
+- (void)logWarningString:(NSString*)inString;
+- (void)logInfoString:(NSString*)inString;
+@end
+
+NS_ASSUME_NONNULL_END
